@@ -2,7 +2,7 @@ import {createNavigationTemplate} from './view/navigation';
 import {createProfileTemplate} from './view/profile';
 import {createFilmCard} from './view/film-card';
 import {createShowMoreBtn} from './view/show-more-btn';
-import {createFilmDetails} from './view/film-details';
+// import {createFilmDetails} from './view/film-details';
 
 import {generateFilm} from './mock/film';
 import {generateFilter} from './mock/filter';
@@ -115,8 +115,4 @@ for (let i = 0; i < COUNT_FILMS_EXTRA_LIST; i++) {
 const footerStatistics = document.querySelector('.footer__statistics');
 render(footerStatistics, createFooterStatistic(COUNT_FILMS_VIEW), 'afterbegin');
 
-
-const comments = new Array(randomInt(0, MAX_COMMENTS_TO_FILM)).fill().map((_, index) => {
-  return generateComment(index + 1);
-});
-render(document.documentElement, createFilmDetails(films[0], comments), 'beforeend');
+// render(document.documentElement, createFilmDetails(films[0], comments), 'beforeend');
