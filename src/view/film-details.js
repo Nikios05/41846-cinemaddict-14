@@ -1,26 +1,20 @@
 import {getFullDate} from '../utils';
 
 const renderFilmGenres = (genres) => {
-  let genresList = '';
-
-  genres.forEach((genre) => {
-    genresList += `<span class="film-details__genre">${genre}</span>`;
-  });
-
-  return genresList;
+  return genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
 };
 
-const renderComment = (comment) => {
+const renderComment = ({emotion, text, author, date}) => {
   return `
     <li class="film-details__comment">
       <span class="film-details__comment-emoji">
-        <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-smile">
+        <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
       </span>
       <div>
-        <p class="film-details__comment-text">${comment.text}</p>
+        <p class="film-details__comment-text">${text}</p>
         <p class="film-details__comment-info">
-          <span class="film-details__comment-author">${comment.author}</span>
-          <span class="film-details__comment-day">${comment.date}</span>
+          <span class="film-details__comment-author">${author}</span>
+          <span class="film-details__comment-day">${date}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>

@@ -1,4 +1,4 @@
-import {getYear, shortenText} from '../utils';
+import {shortenText} from '../utils';
 
 export const createFilmCard = (film) => {
   return `
@@ -6,7 +6,7 @@ export const createFilmCard = (film) => {
       <h3 class="film-card__title">${film.filmName}</h3>
       <p class="film-card__rating">${film.rating}</p>
       <p class="film-card__info">
-        <span class="film-card__year">${getYear(film.releaseDate)}</span>
+        <span class="film-card__year">${film.releaseDate.getFullYear()}</span>
         <span class="film-card__duration">${film.duration}</span>
         <span class="film-card__genre">${film.filmGenres[0]}</span>
       </p>

@@ -1,6 +1,4 @@
-import {randomInt} from '../utils';
-
-import dayjs from 'dayjs';
+import {randomInt, getRandomArrayElement} from '../utils';
 
 const possibleCountry = [
   'Russian',
@@ -61,33 +59,52 @@ const generateDuration = () => {
 };
 
 const generateReleaseDate = () => {
-  const yearGap = randomInt(0, -60);
-  return dayjs().add(yearGap, 'year').toDate();
+  const yearGap = randomInt(0, 60);
+  const year = new Date().getFullYear();
+  const maxMonthCount = 12;
+  const maxDayCount = 28;
+  return new Date(randomInt(year - yearGap, year), randomInt(0, maxMonthCount), randomInt(1, maxDayCount));
+};
+
+const generateAgeRating = () => {
+  const maxAge = 18;
+  const minAge = 6;
+  return randomInt(minAge, maxAge);
+};
+
+const generateRatingFilm = () => {
+  const maxRating = 10;
+  const minRating = 0;
+  return randomInt(minRating, maxRating, false);
+};
+
+const generateParticipantsFilm = () => {
+  return possiblePeopleNames.slice(0, randomInt(1, possiblePeopleNames.length));
 };
 
 const generateFilmGenres = () => {
-  const filmGenres = possibleGenres.slice(0, randomInt(1, 5));
+  const filmGenres = possibleGenres.slice(0, randomInt(1, possibleGenres.length));
   return filmGenres.sort(() => 0.5 - Math.random());
 };
 
 export const generateFilm = (comments) => {
   return {
-    posterUrl: possibleImgPosterNames[randomInt(0, 6)],
-    filmName: possibleFilmNames[randomInt(0, 6)],
-    originFilmName: possibleFilmNames[randomInt(0, 6)],
-    rating: randomInt(1, 9, false),
+    posterUrl: getRandomArrayElement(possibleImgPosterNames),
+    filmName: getRandomArrayElement(possibleFilmNames),
+    originFilmName: getRandomArrayElement(possibleFilmNames),
+    rating: generateRatingFilm(),
     releaseDate: generateReleaseDate(),
-    country: possibleCountry[randomInt(0, 4)],
+    country: getRandomArrayElement(possibleCountry),
     duration: generateDuration(),
     filmGenres: generateFilmGenres(),
     description: generateDescription(),
-    director: possiblePeopleNames[randomInt(0, 4)],
-    screenwriters: possiblePeopleNames.slice(0, randomInt(1, 5)),
-    cast: possiblePeopleNames.slice(0, randomInt(1, 5)),
-    ageRating: randomInt(6, 18),
-    inWatchlist: Boolean(randomInt(0, 1)),
-    isWatched: Boolean(randomInt(0, 1)),
-    isFavorite: Boolean(randomInt(0, 1)),
+    director: getRandomArrayElement(possiblePeopleNames),
+    screenwriters: generateParticipantsFilm(),
+    cast: generateParticipantsFilm(),
+    ageRating: generateAgeRating(),
+    inWatchlist: !!randomInt(),
+    isWatched: !!randomInt(),
+    isFavorite: !!randomInt(),
     comments: Object.values(comments).map((comment) => comment.id),
   };
 };
