@@ -1,4 +1,4 @@
-import {getFullDate} from '../utils';
+import {createElement, getFullDate} from '../utils';
 
 const renderFilmGenres = (genres) => {
   return genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
@@ -22,9 +22,8 @@ const renderComment = ({emotion, text, author, date}) => {
   `;
 };
 
-export const createFilmDetails = (film, comments) => {
-  const showComments = comments.filter(({ id }) => film.comments.includes(id));
-  const commentsTemplate = showComments.map((comment) => renderComment(comment)).join('');
+const createFilmDetails = (film) => {
+  const commentsTemplate = film.comments.map((comment) => renderComment(comment)).join('');
 
   return `
     <section class="film-details">
@@ -105,7 +104,7 @@ export const createFilmDetails = (film, comments) => {
 
         <div class="film-details__bottom-container">
           <section class="film-details__comments-wrap">
-            <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${showComments.length}</span></h3>
+            <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${film.comments.length}</span></h3>
 
             <ul class="film-details__comments-list">
               ${commentsTemplate}
@@ -146,3 +145,25 @@ export const createFilmDetails = (film, comments) => {
     </section>
   `;
 };
+
+export default class FilmDetails {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmDetails(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
