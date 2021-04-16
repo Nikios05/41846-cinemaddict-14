@@ -105,6 +105,6 @@ export const generateFilm = (comments) => {
     inWatchlist: !!randomInt(),
     isWatched: !!randomInt(),
     isFavorite: !!randomInt(),
-    comments: Object.values(comments).map((comment) => comment.id),
+    comments: comments,
   };
 };

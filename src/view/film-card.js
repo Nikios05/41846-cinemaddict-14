@@ -1,6 +1,6 @@
-import {shortenText} from '../utils';
+import {createElement, shortenText} from '../utils';
 
-export const createFilmCard = (film) => {
+const createFilmCard = (film) => {
   return `
     <article class="film-card">
       <h3 class="film-card__title">${film.filmName}</h3>
@@ -27,3 +27,25 @@ export const createFilmCard = (film) => {
     </article>
   `;
 };
+
+export default class FilmCard {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmCard(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
