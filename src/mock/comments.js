@@ -1,5 +1,6 @@
-import {getFullDate, randomInt, getRandomArrayElement} from '../utils';
 import {EMOTIONS} from '../const';
+import {randomInt, getRandomArrayElement} from '../utils/common';
+import {getFullDate} from '../utils/film-helper';
 
 const possiblePeopleNames = [
   'John Cromwell',

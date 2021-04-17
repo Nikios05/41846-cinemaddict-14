@@ -1,4 +1,6 @@
-import {createElement, getFullDate} from '../utils';
+import AbstractView from './abstract-view';
+import {getFullDate} from '../utils/film-helper';
+import {remove} from '../utils/render';
 
 const renderFilmGenres = (genres) => {
   return genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
@@ -146,24 +148,29 @@ const createFilmDetails = (film) => {
   `;
 };
 
-export default class FilmDetails {
+export default class FilmDetails extends AbstractView {
   constructor(film) {
+    super();
+
     this._film = film;
-    this._element = null;
+    this._clickHandler = this._clickHandler.bind(this);
+  }
+
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this.closeDerailFilm();
+  }
+
+  closeDerailFilm() {
+    remove(this);
   }
 
   getTemplate() {
     return createFilmDetails(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setCloseBtnHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._clickHandler);
   }
 }
