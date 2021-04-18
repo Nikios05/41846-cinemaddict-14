@@ -1,4 +1,4 @@
-import {randomInt, getRandomArrayElement} from '../utils';
+import {randomInt, getRandomArrayElement} from '../utils/common';
 
 const possibleCountry = [
   'Russian',
