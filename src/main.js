@@ -10,6 +10,7 @@ import {generateFilter} from './mock/filter';
 import {generateComment} from './mock/comments';
 import {randomInt} from './utils/common';
 import {createElement, remove, render, RenderPosition} from './utils/render';
+import Sort from './view/sort';
 
 const COUNT_FILMS_VIEW = 20;
 const COUNT_FILMS_PER_PAGE = 5;
@@ -76,8 +77,13 @@ const renderFilmCard = (filmsListElement, film) => {
 
 /* Profile */
 render(headerContainer, new ProfileView(), RenderPosition.BEFOREEND);
+
+/* Sort */
+render(mainContainer, new Sort(), RenderPosition.AFTERBEGIN);
+
 /* Navigation / Filter */
 render(mainContainer, new NavigationView(filters), RenderPosition.AFTERBEGIN);
+
 /* Films grid */
 render(mainContainer, createFilmsTemplate(), RenderPosition.BEFOREEND);
 
