@@ -35,6 +35,7 @@ export default class FilmCard extends AbstractView {
 
     this._film = film;
     this._clickHandler = this._clickHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -46,8 +47,19 @@ export default class FilmCard extends AbstractView {
     this._callback.click();
   }
 
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    this._callback.favoriteClick();
+  }
+
   setClickHandler(callback) {
     this._callback.click = callback;
     this.getElement().addEventListener('click', this._clickHandler);
+  }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector('.film-card__controls-item--favorite').addEventListener('click', this._favoriteClickHandler);
   }
 }

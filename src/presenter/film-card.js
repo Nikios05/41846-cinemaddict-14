@@ -3,22 +3,29 @@ import FilmDetails from '../view/film-details';
 import {render, remove, RenderPosition, replace} from '../utils/render';
 
 export default class FilmCard {
-  constructor(insertContainer) {
-    this._insertContainer = insertContainer;
+  constructor(changeData) {
+    this._insertContainer = null;
+    this._changeData = changeData;
 
     this._filmCard = null;
     this._filmDetailsModal = null;
+
+    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
 
     this._handleFilmCardClick = this._handleFilmCardClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(film) {
+  init(film, insertContainer) {
     const prevFilmCard = this._filmCard;
     const prevFilmDetailsModal = this._filmDetailsModal;
 
+    this._filmData = film;
     this._filmCard = new FilmCardView(film);
     this._filmDetailsModal = new FilmDetails(film);
+    this._insertContainer = insertContainer;
+
+    this._filmCard.setFavoriteClickHandler(this._handleFavoriteClick);
 
     if (prevFilmCard === null || prevFilmDetailsModal === null) {
       this._renderFilmCard();
@@ -71,5 +78,17 @@ export default class FilmCard {
     this._filmDetailsModal.setCloseBtnHandler(() => {
       document.removeEventListener('keydown', this._escKeyDownHandler);
     });
+  }
+
+  _handleFavoriteClick() {
+    this._changeData(
+      Object.assign(
+        {},
+        this._filmData,
+        {
+          isFavorite: !this._filmData.isFavorite,
+        },
+      ),
+    );
   }
 }
