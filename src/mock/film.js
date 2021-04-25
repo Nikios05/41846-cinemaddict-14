@@ -1,4 +1,5 @@
 import {randomInt, getRandomArrayElement} from '../utils/common';
+import {nanoid} from 'nanoid';
 
 const possibleCountry = [
   'Russian',
@@ -89,6 +90,7 @@ const generateFilmGenres = () => {
 
 export const generateFilm = (comments) => {
   return {
+    id: nanoid(),
     posterUrl: getRandomArrayElement(possibleImgPosterNames),
     filmName: getRandomArrayElement(possibleFilmNames),
     originFilmName: getRandomArrayElement(possibleFilmNames),
