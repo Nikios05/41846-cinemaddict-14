@@ -1,6 +1,5 @@
-import AbstractView from './abstract-view';
 import {getFullDate} from '../utils/film-helper';
-import {remove} from '../utils/render';
+import SmartView from './smart-view';
 
 const renderFilmGenres = (genres) => {
   return genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
@@ -116,7 +115,7 @@ const createFilmDetails = (film) => {
               <div class="film-details__add-emoji-label"></div>
 
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.currentCommentText ? film.currentCommentText : ''}</textarea>
               </label>
 
               <div class="film-details__emoji-list">
@@ -148,24 +147,56 @@ const createFilmDetails = (film) => {
   `;
 };
 
-export default class FilmDetails extends AbstractView {
+export default class FilmDetails extends SmartView {
   constructor(film) {
     super();
 
-    this._film = film;
+    this._data = film;
+
     this._clickCloseHandler = this._clickCloseHandler.bind(this);
-    this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
+    // this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
     this._watchedClickHandler = this._watchedClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+
+    this._watchlistToggleHandler = this._watchlistToggleHandler.bind(this);
+    this._commentInputHandler = this._commentInputHandler.bind(this);
+
+    this._setInnerHandlers();
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector('#watchlist')
+      .addEventListener('change', this._watchlistToggleHandler);
+
+    this.getElement()
+      .querySelector('.film-details__comment-input')
+      .addEventListener('input', this._commentInputHandler);
+
+
+    this.getElement()
+      .querySelector('.film-details__close-btn')
+      .addEventListener('click', this._clickCloseHandler);
   }
 
   _clickCloseHandler(evt) {
     evt.preventDefault();
     this._callback.closeBtnClick();
+    // this.updateElement();
   }
 
-  _watchlistClickHandler(evt) {
+  // _watchlistClickHandler(evt) {
+  //   evt.preventDefault();
+  //   this._callback.watchlistClick();
+  // }
+
+  _watchlistToggleHandler(evt) {
+    console.log('_watchlistToggleHandler')
     evt.preventDefault();
+    this.updateData({
+      inWatchlist: !this._data.inWatchlist,
+    });
+
     this._callback.watchlistClick();
   }
 
@@ -179,8 +210,21 @@ export default class FilmDetails extends AbstractView {
     this._callback.favoriteClick();
   }
 
+  _commentInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      currentCommentText: evt.target.value,
+    }, true);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setWatchlistClickHandler(this._callback.watchlistClick);
+    this.setCloseBtnHandler(this._callback.closeBtnClick);
+  }
+
   getTemplate() {
-    return createFilmDetails(this._film);
+    return createFilmDetails(this._data);
   }
 
   setCloseBtnHandler(callback) {
@@ -190,7 +234,7 @@ export default class FilmDetails extends AbstractView {
 
   setWatchlistClickHandler(callback) {
     this._callback.watchlistClick = callback;
-    this.getElement().querySelector('#watchlist').addEventListener('input', this._watchlistClickHandler);
+    // this.getElement().querySelector('#watchlist').addEventListener('input', this._watchlistClickHandler);
   }
 
   setWatchedClickHandler(callback) {
@@ -201,5 +245,10 @@ export default class FilmDetails extends AbstractView {
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;
     this.getElement().querySelector('#favorite').addEventListener('input', this._favoriteClickHandler);
+  }
+
+  setCommentInputHandler(callback) {
+    this._callback.commentInput = callback;
+    this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
   }
 }
