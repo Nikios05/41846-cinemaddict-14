@@ -9,6 +9,7 @@ import {randomInt} from './utils/common';
 import {createElement, render, RenderPosition} from './utils/render';
 
 import FilmGridPresenter from './presenter/film-grid';
+import {nanoid} from 'nanoid';
 
 
 /* Generate mock data */
@@ -16,8 +17,8 @@ const COUNT_FILMS_VIEW = 20;
 const MAX_COMMENTS_TO_FILM = 5;
 
 const films = new Array(COUNT_FILMS_VIEW).fill().map(() => {
-  const comments = new Array(randomInt(0, MAX_COMMENTS_TO_FILM)).fill().map((_, index) => {
-    return generateComment(index + 1);
+  const comments = new Array(randomInt(0, MAX_COMMENTS_TO_FILM)).fill().map(() => {
+    return generateComment(nanoid());
   });
 
   return generateFilm(comments);
