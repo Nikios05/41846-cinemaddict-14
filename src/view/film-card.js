@@ -1,5 +1,5 @@
-import AbstractView from './abstract-view';
 import {shortenText} from '../utils/film-helper';
+import AbstractView from './abstract-view';
 
 const createFilmCard = (film) => {
   return `
@@ -35,15 +35,15 @@ export default class FilmCard extends AbstractView {
 
     this._film = film;
 
-    this._clickHandler = this._clickHandler.bind(this);
+    this._clickCardHandler = this._clickCardHandler.bind(this);
     this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
     this._watchedClickHandler = this._watchedClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
-  _clickHandler(evt) {
+  _clickCardHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.clickToOpen();
   }
 
   _watchlistClickHandler(evt) {
@@ -68,9 +68,9 @@ export default class FilmCard extends AbstractView {
     return createFilmCard(this._film);
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().addEventListener('click', this._clickHandler);
+  setClickCardHandler(callback) {
+    this._callback.clickToOpen = callback;
+    this.getElement().addEventListener('click', this._clickCardHandler);
   }
 
   setWatchlistClickHandler(callback) {
