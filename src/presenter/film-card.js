@@ -155,4 +155,8 @@ export default class FilmCard {
     document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
+
+  destroy() {
+    remove(this._filmCard);
+  }
 }

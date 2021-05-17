@@ -9,6 +9,9 @@ import {randomInt} from './utils/common';
 import {createElement, render, RenderPosition} from './utils/render';
 
 import FilmGridPresenter from './presenter/film-grid';
+
+import FilmsModel from './model/films';
+
 import {nanoid} from 'nanoid';
 
 
@@ -27,6 +30,9 @@ const films = new Array(COUNT_FILMS_VIEW).fill().map(() => {
 const filters = generateFilter(films);
 /* --- */
 
+const filmsModel = new FilmsModel();
+filmsModel.setFilms(films);
+
 const headerContainer = document.querySelector('.header');
 const mainContainer = document.querySelector('.main');
 
@@ -34,7 +40,7 @@ const createFooterStatistic = (filmCount) => {
   return createElement(`<p>${filmCount} movies inside</p>`);
 };
 
-const filmsPresenter = new FilmGridPresenter(mainContainer);
+const filmsPresenter = new FilmGridPresenter(mainContainer, filmsModel);
 
 /* Profile */
 render(headerContainer, new ProfileView(), RenderPosition.BEFOREEND);
