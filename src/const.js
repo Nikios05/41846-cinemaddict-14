@@ -8,6 +8,14 @@ export const SortType = {
   RATING: 'rating',
 };
 
+export const NavigationType = {
+  ALL: 'All movies',
+  WATCHLIST: 'watchlist',
+  WATCHED: 'watched',
+  FAVORITES: 'favorites',
+  STATS: 'Stats',
+};
+
 export const UserAction = {
   UPDATE_FILM: 'UPDATE_FILM',
 };

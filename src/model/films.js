@@ -15,7 +15,6 @@ export default class Films extends Observer {
   }
 
   updateFilmCard(updateType, update) {
-    console.log('update')
     const index = this._films.findIndex((film) => film.id === update.id);
 
     if (index === -1) {
@@ -27,8 +26,6 @@ export default class Films extends Observer {
       update,
       ...this._films.slice(index + 1),
     ];
-
-    console.log(this._films)
 
     this._notify(updateType, update);
   }

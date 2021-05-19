@@ -8,16 +8,18 @@ import MoreButtonView from '../view/show-more-btn';
 import FilmCardPresenter from '../presenter/film-card';
 import {SortType, UserAction, UpdateType} from '../const';
 import {sortFilmsDate, sortFilmsRating} from '../utils/film-helper';
+import {navItem} from '../utils/navigation';
 
 const COUNT_FILMS_PER_PAGE = 5;
 const COUNT_FILMS_EXTRA_LIST = 2;
 
 export default class FilmGrid {
-  constructor(mainContainer, filmsModel) {
+  constructor(mainContainer, filmsModel, navigationModel) {
     this._mainContainer = mainContainer;
     this._renderFilmsCount = COUNT_FILMS_PER_PAGE;
 
     this._filmsModel = filmsModel;
+    this._navigationModel = navigationModel;
 
     this._allFilmPresenters = [];
     this._topRatedFilmPresenters = [];
@@ -41,6 +43,7 @@ export default class FilmGrid {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
+    this._navigationModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -50,14 +53,18 @@ export default class FilmGrid {
   }
 
   _getFilms() {
+    const navigationType = this._navigationModel.getNavItem();
+    const films = this._filmsModel.getFilms();
+    const filtredFilms = navItem[navigationType](films);
+
     switch (this._currentSortType) {
       case SortType.DATE:
-        return this._filmsModel.getFilms().slice().sort(sortFilmsDate);
+        return filtredFilms.sort(sortFilmsDate);
       case SortType.RATING:
-        return this._filmsModel.getFilms().slice().sort(sortFilmsRating);
+        return filtredFilms.sort(sortFilmsRating);
     }
 
-    return this._filmsModel.getFilms();
+    return filtredFilms;
   }
 
   get _countFilms() {
@@ -190,22 +197,12 @@ export default class FilmGrid {
   }
 
   _handleViewAction(actionType, updateType, update) {
-    console.log('_handleViewAction', actionType, updateType, update);
-    // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
     if (actionType === UserAction.UPDATE_FILM) {
       this._filmsModel.updateFilmCard(updateType, update);
     }
   }
 
   _handleModelEvent(updateType, data) {
-    console.log('_handleModelEvent', updateType, data);
-    // В зависимости от типа изменений решаем, что делать:
-    // - обновить часть списка (например, когда поменялось описание)
-    // - обновить список (например, когда задача ушла в архив)
-    // - обновить всю доску (например, при переключении фильтра)
     switch (updateType) {
       case UpdateType.PATCH:
         // - обновить часть списка (например, когда поменялось описание)

@@ -1,16 +1,17 @@
 import ProfileView from './view/profile';
-import NavigationView from './view/navigation';
+// import NavigationView from './view/navigation';
 
 import {generateFilm} from './mock/film';
-import {generateFilter} from './mock/filter';
 import {generateComment} from './mock/comments';
 
 import {randomInt} from './utils/common';
 import {createElement, render, RenderPosition} from './utils/render';
 
 import FilmGridPresenter from './presenter/film-grid';
+import NavigationPresenter from './presenter/navigation';
 
 import FilmsModel from './model/films';
+import NavigationModel from './model/navigation';
 
 import {nanoid} from 'nanoid';
 
@@ -27,8 +28,10 @@ const films = new Array(COUNT_FILMS_VIEW).fill().map(() => {
   return generateFilm(comments);
 });
 
-const filters = generateFilter(films);
+// const filters = generateFilter(films);
 /* --- */
+
+const navigationModel = new NavigationModel();
 
 const filmsModel = new FilmsModel();
 filmsModel.setFilms(films);
@@ -40,15 +43,17 @@ const createFooterStatistic = (filmCount) => {
   return createElement(`<p>${filmCount} movies inside</p>`);
 };
 
-const filmsPresenter = new FilmGridPresenter(mainContainer, filmsModel);
+const navigationPresenter = new NavigationPresenter(mainContainer, navigationModel, filmsModel);
+const filmsPresenter = new FilmGridPresenter(mainContainer, filmsModel, navigationModel);
 
 /* Profile */
 render(headerContainer, new ProfileView(), RenderPosition.BEFOREEND);
 
 /* Navigation / Filter */
-render(mainContainer, new NavigationView(filters), RenderPosition.AFTERBEGIN);
+// render(mainContainer, new NavigationView(navItems, 'all'), RenderPosition.AFTERBEGIN);
 
 /* Film Grid */
+navigationPresenter.init();
 filmsPresenter.init();
 
 /* Footer */
