@@ -1,6 +1,7 @@
 import FilmCardView from '../view/film-card';
 import FilmDetails from '../view/film-details';
 import {render, remove, RenderPosition, replace} from '../utils/render';
+import {UpdateType, UserAction} from '../const';
 
 export default class FilmCard {
   constructor(changeData, newOpenCardModal, insertContainer) {
@@ -98,6 +99,8 @@ export default class FilmCard {
 
   _handleAddNewComment() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._filmData,
@@ -110,6 +113,8 @@ export default class FilmCard {
 
   _handleWatchlistClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._filmData,
@@ -122,6 +127,8 @@ export default class FilmCard {
 
   _handleWatchedClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._filmData,
@@ -134,6 +141,8 @@ export default class FilmCard {
 
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._filmData,

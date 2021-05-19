@@ -49,7 +49,7 @@ render(headerContainer, new ProfileView(), RenderPosition.BEFOREEND);
 render(mainContainer, new NavigationView(filters), RenderPosition.AFTERBEGIN);
 
 /* Film Grid */
-filmsPresenter.init(films);
+filmsPresenter.init();
 
 /* Footer */
 const footerStatistics = document.querySelector('.footer__statistics');
