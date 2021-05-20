@@ -12,6 +12,7 @@ import NavigationPresenter from './presenter/navigation';
 
 import FilmsModel from './model/films';
 import NavigationModel from './model/navigation';
+import CommentsModel from './model/comments';
 
 import {nanoid} from 'nanoid';
 
@@ -36,6 +37,8 @@ const navigationModel = new NavigationModel();
 const filmsModel = new FilmsModel();
 filmsModel.setFilms(films);
 
+const commentsModel = new CommentsModel();
+
 const headerContainer = document.querySelector('.header');
 const mainContainer = document.querySelector('.main');
 
@@ -44,13 +47,10 @@ const createFooterStatistic = (filmCount) => {
 };
 
 const navigationPresenter = new NavigationPresenter(mainContainer, navigationModel, filmsModel);
-const filmsPresenter = new FilmGridPresenter(mainContainer, filmsModel, navigationModel);
+const filmsPresenter = new FilmGridPresenter(mainContainer, filmsModel, commentsModel, navigationModel);
 
 /* Profile */
 render(headerContainer, new ProfileView(), RenderPosition.BEFOREEND);
-
-/* Navigation / Filter */
-// render(mainContainer, new NavigationView(navItems, 'all'), RenderPosition.AFTERBEGIN);
 
 /* Film Grid */
 navigationPresenter.init();

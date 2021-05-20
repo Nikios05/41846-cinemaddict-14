@@ -21,13 +21,6 @@ const createNavItemTemplate = (navItem, currentNavigationType) => {
 const createNavigationTemplate = (navItems, currentNavigationType) => {
   const navItemTemplate = navItems.map((navItem) => createNavItemTemplate(navItem, currentNavigationType)).join('');
 
-  /*
-  div class="main-navigation__items">
-        <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
-        ${filterTemplate}
-      </div>
-      <a href="#stats" class="main-navigation__additional">Stats</a>
-  */
   return `
     <nav class="main-navigation">
       ${navItemTemplate}

@@ -1,13 +1,15 @@
 import FilmCardView from '../view/film-card';
 import FilmDetails from '../view/film-details';
 import {render, remove, RenderPosition, replace} from '../utils/render';
-import {UpdateType, UserAction} from '../const';
+import {NavigationType, UpdateType, UserAction} from '../const';
 
 export default class FilmCard {
-  constructor(changeData, newOpenCardModal, insertContainer) {
+  constructor(changeData, newOpenCardModal, commentsModel, navigationModel, insertContainer) {
     this._insertContainer = insertContainer;
     this._changeData = changeData;
     this._newOpenCardModal = newOpenCardModal;
+    this._commentsModel = commentsModel;
+    this._navigationModel = navigationModel;
 
     this._filmCard = null;
     this._filmDetailsModal = null;
@@ -17,17 +19,21 @@ export default class FilmCard {
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
 
+    this._handleAddComments = this._handleAddComments.bind(this);
+    this._handleRemoveComments = this._handleRemoveComments.bind(this);
+
     this._handleFilmCardClick = this._handleFilmCardClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleFilmDetailFilmClose = this._handleFilmDetailFilmClose.bind(this);
-    this._handleAddNewComment = this._handleAddNewComment.bind(this);
   }
 
   init(filmData) {
     const prevFilmCard = this._filmCard;
 
     this._filmData = filmData;
-    this._filmCard = new FilmCardView(filmData);
+    this._commentsModel.setFilmComments(filmData.comments);
+    this._commentsData = this._commentsModel.getFilmComments();
+    this._filmCard = new FilmCardView(filmData, this._commentsData);
 
     this._setHandlersFilmCard();
 
@@ -64,13 +70,13 @@ export default class FilmCard {
     this._filmDetailsModal.setWatchedClickHandler(this._handleWatchedClick);
     this._filmDetailsModal.setFavoriteClickHandler(this._handleFavoriteClick);
     this._filmDetailsModal.setCloseBtnHandler(this._handleFilmDetailFilmClose);
-    this._filmDetailsModal.setUpdateCommentsHandler(this._handleAddNewComment);
+    this._filmDetailsModal.setAddCommentHandler(this._handleAddComments);
+    this._filmDetailsModal.setRemoveCommentHandler(this._handleRemoveComments);
   }
 
   _showDetailsFilm() {
     this._newOpenCardModal();
-
-    this._filmDetailsModal = new FilmDetails(this._filmData);
+    this._filmDetailsModal = new FilmDetails(this._filmData, this._commentsData);
     this._setHandlersForDetailsModal();
     this._openedFilmDetailsModal = true;
 
@@ -97,24 +103,26 @@ export default class FilmCard {
     this.closeDetailsFilm();
   }
 
-  _handleAddNewComment() {
+  _handleAddComments(comment) {
     this._changeData(
-      UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
-      Object.assign(
-        {},
-        this._filmData,
-        {
-          comments: this._filmData.comments,
-        },
-      ),
+      UserAction.ADD_COMMENT,
+      UpdateType.PATCH_COMMENTS_LIST,
+      {filmId: this.filmId, newComment: comment},
+    );
+  }
+
+  _handleRemoveComments(delIndex) {
+    this._changeData(
+      UserAction.REMOVE_COMMENT,
+      UpdateType.PATCH_COMMENTS_LIST,
+      {filmId: this.filmId, delIndex: delIndex},
     );
   }
 
   _handleWatchlistClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
+      this._navigationModel.getNavItem() === NavigationType.WATCHLIST ? UpdateType.MINOR : UpdateType.PATCH,
       Object.assign(
         {},
         this._filmData,
@@ -128,7 +136,7 @@ export default class FilmCard {
   _handleWatchedClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
+      this._navigationModel.getNavItem() === NavigationType.WATCHED ? UpdateType.MINOR : UpdateType.PATCH,
       Object.assign(
         {},
         this._filmData,
@@ -142,7 +150,7 @@ export default class FilmCard {
   _handleFavoriteClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
+      this._navigationModel.getNavItem() === NavigationType.FAVORITES ? UpdateType.MINOR : UpdateType.PATCH,
       Object.assign(
         {},
         this._filmData,

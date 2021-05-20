@@ -29,4 +29,15 @@ export default class Films extends Observer {
 
     this._notify(updateType, update);
   }
+
+  updateFilmComments(updateType, updateFilm, newComments) {
+    const updatedFilm = Object.assign(
+      {},
+      this._films.find((film) => film.id === updateFilm.id),
+      {
+        comments: newComments,
+      },
+    );
+    this.updateFilmCard(updateType, updatedFilm);
+  }
 }

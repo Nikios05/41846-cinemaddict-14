@@ -14,11 +14,12 @@ const COUNT_FILMS_PER_PAGE = 5;
 const COUNT_FILMS_EXTRA_LIST = 2;
 
 export default class FilmGrid {
-  constructor(mainContainer, filmsModel, navigationModel) {
+  constructor(mainContainer, filmsModel, commentsModel, navigationModel) {
     this._mainContainer = mainContainer;
     this._renderFilmsCount = COUNT_FILMS_PER_PAGE;
 
     this._filmsModel = filmsModel;
+    this._commentsModel = commentsModel;
     this._navigationModel = navigationModel;
 
     this._allFilmPresenters = [];
@@ -43,6 +44,7 @@ export default class FilmGrid {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
+    this._commentsModel.addObserver(this._handleModelEvent);
     this._navigationModel.addObserver(this._handleModelEvent);
   }
 
@@ -97,7 +99,7 @@ export default class FilmGrid {
     }
 
     allFilms.map((film) => {
-      const presenter = new FilmCardPresenter(this._handleViewAction, this._handleNewOpenCardModal, insertContainer);
+      const presenter = new FilmCardPresenter(this._handleViewAction, this._handleNewOpenCardModal, this._commentsModel, this._navigationModel, insertContainer);
       presenter.init(film);
 
       presenterList.push(presenter);
@@ -196,9 +198,31 @@ export default class FilmGrid {
     }
   }
 
+  _clearCommentsFilmsList() {
+    this._mostCommentsFilmPresenters.forEach((presenter) => presenter.destroy());
+    this._mostCommentsFilmPresenters = [];
+  }
+
   _handleViewAction(actionType, updateType, update) {
-    if (actionType === UserAction.UPDATE_FILM) {
-      this._filmsModel.updateFilmCard(updateType, update);
+    let updatedFilm;
+    if (update.filmId) {
+      updatedFilm = this._filmsModel.getFilms().find((film) => film.id === update.filmId);
+    }
+
+    switch (actionType) {
+      case UserAction.UPDATE_FILM:
+        this._filmsModel.updateFilmCard(updateType, update);
+        break;
+      case UserAction.ADD_COMMENT:
+        this._commentsModel.setFilmComments(updatedFilm.comments);
+        this._commentsModel.addComment(update.newComment);
+        this._filmsModel.updateFilmComments(updateType, updatedFilm, this._commentsModel.getFilmComments());
+        break;
+      case UserAction.REMOVE_COMMENT:
+        this._commentsModel.setFilmComments(updatedFilm.comments);
+        this._commentsModel.removeComment(update.delIndex);
+        this._filmsModel.updateFilmComments(updateType, updatedFilm, this._commentsModel.getFilmComments());
+        break;
     }
   }
 
@@ -207,6 +231,12 @@ export default class FilmGrid {
       case UpdateType.PATCH:
         // - обновить часть списка (например, когда поменялось описание)
         this._updateFoundPresenter(data);
+        break;
+      case UpdateType.PATCH_COMMENTS_LIST:
+        // - обновить часть списка (например, когда поменялось описание)
+        this._updateFoundPresenter(data);
+        this._clearCommentsFilmsList();
+        this._renderMostCommentsFilms();
         break;
       case UpdateType.MINOR:
         // - обновить список (например, когда задача ушла в архив)
