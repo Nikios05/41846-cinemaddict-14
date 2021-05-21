@@ -20,6 +20,7 @@
     "node": "10"
   },
   "dependencies": {
+    "he": "^1.2.0",
     "nanoid": "^3.1.22"
   }
 }

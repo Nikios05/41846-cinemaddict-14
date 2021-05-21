@@ -1,7 +1,7 @@
 import {shortenText} from '../utils/film-helper';
 import AbstractView from './abstract-view';
 
-const createFilmCard = (film) => {
+const createFilmCard = (film, comments) => {
   return `
     <article class="film-card">
       <h3 class="film-card__title">${film.filmName}</h3>
@@ -13,7 +13,7 @@ const createFilmCard = (film) => {
       </p>
       <img src="./images/posters/${film.posterUrl}" alt="" class="film-card__poster">
       <p class="film-card__description">${shortenText(film.description)}</p>
-      <a class="film-card__comments">${film.comments.length} comments</a>
+      <a class="film-card__comments">${comments.length} comments</a>
       <div class="film-card__controls">
         <button class="film-card__controls-item button
                        film-card__controls-item--add-to-watchlist
@@ -30,10 +30,11 @@ const createFilmCard = (film) => {
 };
 
 export default class FilmCard extends AbstractView {
-  constructor(film) {
+  constructor(film, comments) {
     super();
 
     this._film = film;
+    this._comments = comments;
 
     this._clickCardHandler = this._clickCardHandler.bind(this);
     this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
@@ -65,7 +66,7 @@ export default class FilmCard extends AbstractView {
   }
 
   getTemplate() {
-    return createFilmCard(this._film);
+    return createFilmCard(this._film, this._comments);
   }
 
   setClickCardHandler(callback) {

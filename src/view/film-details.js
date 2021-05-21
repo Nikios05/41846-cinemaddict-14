@@ -2,6 +2,7 @@ import {getFullDate} from '../utils/film-helper';
 import SmartView from './smart-view';
 import {EMOTIONS} from '../const';
 import {nanoid} from 'nanoid';
+import he from 'he';
 
 const renderFilmGenres = (genres) => {
   return genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
@@ -42,8 +43,8 @@ const renderSelectEmoji = (selectEmoji) => {
   return `<img src="./images/emoji/${selectEmoji}.png" width="55" height="55" alt="emoji-${selectEmoji}">`;
 };
 
-const createFilmDetails = (film) => {
-  const commentsTemplate = film.comments.map((comment) => renderComment(comment)).join('');
+const createFilmDetails = (film, comments) => {
+  const commentsTemplate = comments.map((comment) => renderComment(comment)).join('');
 
   const emotionsListTemplate = createEmotionsList(film.currentCommentEmoji);
 
@@ -140,7 +141,7 @@ const createFilmDetails = (film) => {
               </div>
 
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.currentCommentText ? film.currentCommentText : ''}</textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${film.currentCommentText ? he.encode(film.currentCommentText) : ''}</textarea>
               </label>
 
               <div class="film-details__emoji-list">
@@ -155,10 +156,11 @@ const createFilmDetails = (film) => {
 };
 
 export default class FilmDetails extends SmartView {
-  constructor(film) {
+  constructor(film, comments) {
     super();
 
     this._data = film;
+    this._comments = comments;
 
     this._clickCloseHandler = this._clickCloseHandler.bind(this);
     this._watchlistToggleHandler = this._watchlistToggleHandler.bind(this);
@@ -226,7 +228,6 @@ export default class FilmDetails extends SmartView {
     evt.preventDefault();
     this.updateData({
       currentCommentText: evt.target.value,
-      currentScroll: this.getElement().scrollTop,
     }, true);
   }
 
@@ -246,15 +247,16 @@ export default class FilmDetails extends SmartView {
       }
 
       const newComment = this._newComment();
-      this._data.comments.push(newComment);
+      this._comments.push(newComment);
 
       this._deleteCurrentInputsData();
 
       this.updateData({
-        comments: this._data.comments,
+        comments: this._comments,
+        currentScroll: this.getElement().scrollTop,
       });
 
-      this._callback.updateComments();
+      this._callback.addCommentHandler(newComment);
     }
   }
 
@@ -270,14 +272,14 @@ export default class FilmDetails extends SmartView {
 
   _deleteCommentHandler(evt) {
     evt.preventDefault();
-    const delIndex = this._data.comments.findIndex((comment) => comment.id === evt.target.id);
-    this._data.comments.splice(delIndex, 1);
+    const delIndex = this._comments.findIndex((comment) => comment.id === evt.target.id);
+    this._comments.splice(delIndex, 1);
     this.updateData({
-      comments: this._data.comments,
+      comments: this._comments,
       currentScroll: this.getElement().scrollTop,
     });
 
-    this._callback.updateComments();
+    this._callback.removeCommentHandler(delIndex);
   }
 
   _deleteCurrentInputsData() {
@@ -293,11 +295,12 @@ export default class FilmDetails extends SmartView {
     this.setFavoriteClickHandler(this._callback.favoriteClick);
     this.setCloseBtnHandler(this._callback.closeBtnClick);
 
-    this.setUpdateCommentsHandler(this._callback.updateComments);
+    this.setAddCommentHandler(this._callback.addCommentHandler);
+    this.setRemoveCommentHandler(this._callback.removeCommentHandler);
   }
 
   getTemplate() {
-    return createFilmDetails(this._data);
+    return createFilmDetails(this._data, this._comments);
   }
 
   setCloseBtnHandler(callback) {
@@ -307,20 +310,24 @@ export default class FilmDetails extends SmartView {
 
   setWatchlistClickHandler(callback) {
     this._callback.watchlistClick = callback;
-    this.getElement().querySelector('#watchlist').addEventListener('change', this._watchlistToggleHandler);
+    this.getElement().querySelector('.film-details__control-label--watchlist').addEventListener('click', this._watchlistToggleHandler);
   }
 
   setWatchedClickHandler(callback) {
     this._callback.watchedClick = callback;
-    this.getElement().querySelector('#watched').addEventListener('change', this._watchedToggleHandler);
+    this.getElement().querySelector('.film-details__control-label--watched').addEventListener('click', this._watchedToggleHandler);
   }
 
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;
-    this.getElement().querySelector('#favorite').addEventListener('change', this._favoriteToggleHandler);
+    this.getElement().querySelector('.film-details__control-label--favorite').addEventListener('click', this._favoriteToggleHandler);
   }
 
-  setUpdateCommentsHandler(callback) {
-    this._callback.updateComments = callback;
+  setAddCommentHandler(callback) {
+    this._callback.addCommentHandler = callback;
+  }
+
+  setRemoveCommentHandler(callback) {
+    this._callback.removeCommentHandler = callback;
   }
 }
