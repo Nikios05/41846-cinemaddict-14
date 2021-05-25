@@ -1,7 +1,6 @@
-import {getFullDate} from '../utils/film-helper';
+import {convertMinToTime, getFullDate, getFullCommentDate} from '../utils/film-helper';
 import SmartView from './smart-view';
 import {EMOTIONS} from '../const';
-import {nanoid} from 'nanoid';
 import he from 'he';
 
 const renderFilmGenres = (genres) => {
@@ -18,7 +17,7 @@ const renderComment = ({id, emotion, text, author, date}) => {
         <p class="film-details__comment-text">${text}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
-          <span class="film-details__comment-day">${date}</span>
+          <span class="film-details__comment-day">${getFullCommentDate(date)}</span>
           <button class="film-details__comment-delete" id="${id}">Delete</button>
         </p>
       </div>
@@ -59,7 +58,7 @@ const createFilmDetails = (film, comments) => {
           </div>
           <div class="film-details__info-wrap">
             <div class="film-details__poster">
-              <img class="film-details__poster-img" src="./images/posters/${film.posterUrl}" alt="">
+              <img class="film-details__poster-img" src="./${film.posterUrl}" alt="">
 
               <p class="film-details__age">${film.ageRating}+</p>
             </div>
@@ -95,7 +94,7 @@ const createFilmDetails = (film, comments) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${film.duration}</td>
+                  <td class="film-details__cell">${convertMinToTime(film.duration)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>
@@ -241,20 +240,16 @@ export default class FilmDetails extends SmartView {
 
   _commentSendHandler(evt) {
     if ((evt.metaKey || evt.ctrlKey) && evt.key === 'Enter') {
+      this._blockUsersInputs();
+
       if (!this._data.currentCommentEmoji || !this._data.currentCommentText) {
         alert('Для добавления комментария, нужно выбрать эмоцию и ввести текст в поле ввода');
         return ;
       }
 
       const newComment = this._newComment();
-      this._comments.push(newComment);
 
       this._deleteCurrentInputsData();
-
-      this.updateData({
-        comments: this._comments,
-        currentScroll: this.getElement().scrollTop,
-      });
 
       this._callback.addCommentHandler(newComment);
     }
@@ -262,29 +257,57 @@ export default class FilmDetails extends SmartView {
 
   _newComment() {
     return {
-      id: nanoid(),
-      author: 'Me',
       text: this._data.currentCommentText,
-      date: getFullDate(new Date()),
       emotion: this._data.currentCommentEmoji,
     };
   }
 
   _deleteCommentHandler(evt) {
     evt.preventDefault();
+    evt.target.innerText = 'Deleting...';
+    evt.target.disabled = true;
+    evt.target.classList.add('film-details__comment-delete--disabled');
+
     const delIndex = this._comments.findIndex((comment) => comment.id === evt.target.id);
     this._comments.splice(delIndex, 1);
-    this.updateData({
-      comments: this._comments,
-      currentScroll: this.getElement().scrollTop,
-    });
 
-    this._callback.removeCommentHandler(delIndex);
+    this._data.currentScroll = this.getElement().scrollTop;
+
+    this._callback.removeCommentHandler(evt.target.id);
   }
 
   _deleteCurrentInputsData() {
     delete this._data.currentCommentText;
     delete this._data.currentCommentEmoji;
+  }
+
+  _blockUsersInputs() {
+    this.getElement().querySelector('.film-details__comment-input').disabled = true;
+    this.getElement().querySelectorAll('.film-details__emoji-item').forEach((item) => {
+      item.disabled = true;
+    });
+  }
+
+  updateDetailFilmModal(update) {
+    this._comments = update;
+
+    this.updateData({
+      comments: update,
+      currentScroll: this.getElement().scrollTop,
+    });
+  }
+
+  restoreDefaultState() {
+    const disabledDelBtn = this.getElement().querySelector('.film-details__comment-delete--disabled');
+    if (disabledDelBtn) {
+      disabledDelBtn.disabled = false;
+      disabledDelBtn.innerText = 'Delete';
+    }
+
+    this.getElement().querySelector('.film-details__comment-input').disabled = false;
+    this.getElement().querySelectorAll('.film-details__emoji-item').forEach((item) => {
+      item.disabled = false;
+    });
   }
 
   restoreHandlers() {

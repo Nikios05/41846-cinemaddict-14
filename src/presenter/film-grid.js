@@ -4,6 +4,7 @@ import FilmListView from '../view/film-list';
 import SortView from '../view/sort';
 import FilmsGrid from '../view/films-grid';
 import MoreButtonView from '../view/show-more-btn';
+import LoadingView from '../view/loading.js';
 
 import FilmCardPresenter from '../presenter/film-card';
 import {SortType, UserAction, UpdateType} from '../const';
@@ -14,7 +15,7 @@ const COUNT_FILMS_PER_PAGE = 5;
 const COUNT_FILMS_EXTRA_LIST = 2;
 
 export default class FilmGrid {
-  constructor(mainContainer, filmsModel, commentsModel, navigationModel) {
+  constructor(mainContainer, filmsModel, commentsModel, navigationModel, api) {
     this._mainContainer = mainContainer;
     this._renderFilmsCount = COUNT_FILMS_PER_PAGE;
 
@@ -27,6 +28,8 @@ export default class FilmGrid {
     this._mostCommentsFilmPresenters = [];
 
     this._currentSortType = SortType.DEFAULT;
+    this._isLoading = true;
+    this._api = api;
 
     this._sortComponent = null;
     this._loadMoreButton = null;
@@ -35,6 +38,7 @@ export default class FilmGrid {
     this._allFilmsList = new FilmListView(false, 'all-list', 'All movies. Upcoming', true);
     this._topFilmTemplate = new FilmListView(true, 'top-list', 'Top rated');
     this._mostFilmTemplate = new FilmListView(true, 'most-com-list', 'Most commented');
+    this._loadingComponent = new LoadingView();
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -74,6 +78,11 @@ export default class FilmGrid {
   }
 
   _renderFilmsGrid() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     if (this._countFilms === 0) {
       //рендер заглушки
       // this._renderNoTasks();
@@ -183,13 +192,11 @@ export default class FilmGrid {
     remove(this._sortComponent);
     // remove(this._noTaskComponent);
     remove(this._loadMoreButton);
+    remove(this._loadingComponent);
 
     if (resetRenderedFilmCount) {
       this._renderFilmsCount = COUNT_FILMS_PER_PAGE;
     } else {
-      // На случай, если перерисовка доски вызвана
-      // уменьшением количества задач (например, удаление или перенос в архив)
-      // нужно скорректировать число показанных задач
       this._renderFilmsCount = Math.min(this._countFilms, this._renderFilmsCount);
     }
 
@@ -211,17 +218,33 @@ export default class FilmGrid {
 
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilmCard(updateType, update);
+        this._api.updateFilm(update).then((response) => {
+          this._filmsModel.updateFilmCard(updateType, response);
+        });
         break;
       case UserAction.ADD_COMMENT:
         this._commentsModel.setFilmComments(updatedFilm.comments);
-        this._commentsModel.addComment(update.newComment);
-        this._filmsModel.updateFilmComments(updateType, updatedFilm, this._commentsModel.getFilmComments());
+        this._api.addComment(updatedFilm, update.newComment)
+          .then((comments) => {
+            this._commentsModel.addComment(comments);
+            this._filmsModel.updateFilmComments(updateType, updatedFilm, this._commentsModel.getFilmComments());
+            update.filmDetailsModal.updateDetailFilmModal(comments);
+          })
+          .catch(() => {
+            update.filmDetailsModal.restoreDefaultState();
+          });
         break;
       case UserAction.REMOVE_COMMENT:
         this._commentsModel.setFilmComments(updatedFilm.comments);
-        this._commentsModel.removeComment(update.delIndex);
-        this._filmsModel.updateFilmComments(updateType, updatedFilm, this._commentsModel.getFilmComments());
+        this._api.removeComment(update.delCommentId)
+          .then(() => {
+            this._commentsModel.removeComment(update.delCommentId);
+            this._filmsModel.updateFilmComments(updateType, updatedFilm, this._commentsModel.getFilmComments());
+            update.filmDetailsModal.updateElement();
+          })
+          .catch(() => {
+            update.filmDetailsModal.restoreDefaultState();
+          });
         break;
     }
   }
@@ -229,41 +252,44 @@ export default class FilmGrid {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        // - обновить часть списка (например, когда поменялось описание)
+        // - обновить часть списка
         this._updateFoundPresenter(data);
         break;
       case UpdateType.PATCH_COMMENTS_LIST:
-        // - обновить часть списка (например, когда поменялось описание)
+        // - обновить часть списка и грид с наибольшими комментариями
         this._updateFoundPresenter(data);
         this._clearCommentsFilmsList();
         this._renderMostCommentsFilms();
         break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда задача ушла в архив)
+        // - обновить список
         this._clearFilmsGrid();
         this._renderSort();
         this._renderAllFilms();
         break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
+        // - обновить весь грид
         this._clearFilmsGrid({resetRenderedFilmCount: true, resetSortType: true});
         this._renderSort();
         this._renderAllFilms();
+        break;
+      case UpdateType.INIT:
+        // - обновление при инициализации с сервера
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderFilmsGrid();
         break;
     }
   }
 
   _handleSortTypeChange(sortType) {
-    // - Сортируем задачи
     if (this._currentSortType === sortType) {
       return;
     }
 
     this._currentSortType = sortType;
-    // - Очищаем список
     this._clearFilmsGrid({resetRenderedFilmCount: true});
     this._renderSort();
-    // - Рендерим список заново
     this._renderAllFilms();
   }
 
@@ -290,6 +316,7 @@ export default class FilmGrid {
 
   _renderMoreButton() {
     if (this._loadMoreButton !== null) {
+      remove(this._loadMoreButton);
       this._loadMoreButton = null;
     }
 
@@ -298,5 +325,9 @@ export default class FilmGrid {
     this._loadMoreButton.setClickHandler(this._handleMoreButtonClick);
 
     render(this._allFilmsList, this._loadMoreButton, RenderPosition.BEFOREEND);
+  }
+
+  _renderLoading() {
+    render(this._filmsGrid, this._loadingComponent, RenderPosition.AFTERBEGIN);
   }
 }

@@ -1,7 +1,8 @@
 import FilmCardView from '../view/film-card';
 import FilmDetails from '../view/film-details';
 import {render, remove, RenderPosition, replace} from '../utils/render';
-import {NavigationType, UpdateType, UserAction} from '../const';
+import {NavigationType, UpdateType, UserAction, END_POINT, AUTHORIZATION} from '../const';
+import Api from '../api';
 
 export default class FilmCard {
   constructor(changeData, newOpenCardModal, commentsModel, navigationModel, insertContainer) {
@@ -31,9 +32,7 @@ export default class FilmCard {
     const prevFilmCard = this._filmCard;
 
     this._filmData = filmData;
-    this._commentsModel.setFilmComments(filmData.comments);
-    this._commentsData = this._commentsModel.getFilmComments();
-    this._filmCard = new FilmCardView(filmData, this._commentsData);
+    this._filmCard = new FilmCardView(filmData);
 
     this._setHandlersFilmCard();
 
@@ -41,8 +40,6 @@ export default class FilmCard {
       return;
     }
 
-    // // Проверка на наличие в DOM необходима,
-    // // чтобы не пытаться заменить то, что не было отрисовано
     if (this._insertContainer.contains(prevFilmCard.getElement())) {
       replace(this._filmCard, prevFilmCard);
     }
@@ -75,13 +72,25 @@ export default class FilmCard {
   }
 
   _showDetailsFilm() {
-    this._newOpenCardModal();
-    this._filmDetailsModal = new FilmDetails(this._filmData, this._commentsData);
-    this._setHandlersForDetailsModal();
-    this._openedFilmDetailsModal = true;
+    const api = new Api(END_POINT, AUTHORIZATION);
 
-    document.body.classList.add('hide-overflow');
-    render(document.body, this._filmDetailsModal, RenderPosition.BEFOREEND);
+    api.getFilmComments(this._filmData.id)
+      .then((comments) => {
+        this._commentsModel.setFilmComments(comments);
+        this._commentsData = this._commentsModel.getFilmComments();
+      })
+      .catch(() => {
+        this._commentsModel.setFilmComments([]);
+      })
+      .then(() => {
+        this._newOpenCardModal();
+        this._filmDetailsModal = new FilmDetails(this._filmData, this._commentsData);
+        this._setHandlersForDetailsModal();
+        this._openedFilmDetailsModal = true;
+        document.body.classList.add('hide-overflow');
+        render(document.body, this._filmDetailsModal, RenderPosition.BEFOREEND);
+        this._filmDetailsModal.setCloseBtnHandler(this._handleFilmDetailFilmClose);
+      });
   }
 
   _escKeyDownHandler(evt) {
@@ -95,8 +104,6 @@ export default class FilmCard {
     this._showDetailsFilm();
 
     document.addEventListener('keydown', this._escKeyDownHandler);
-
-    this._filmDetailsModal.setCloseBtnHandler(this._handleFilmDetailFilmClose);
   }
 
   _handleFilmDetailFilmClose() {
@@ -107,15 +114,15 @@ export default class FilmCard {
     this._changeData(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH_COMMENTS_LIST,
-      {filmId: this.filmId, newComment: comment},
+      {filmDetailsModal: this._filmDetailsModal, filmId: this.filmId, newComment: comment},
     );
   }
 
-  _handleRemoveComments(delIndex) {
+  _handleRemoveComments(delCommentId) {
     this._changeData(
       UserAction.REMOVE_COMMENT,
       UpdateType.PATCH_COMMENTS_LIST,
-      {filmId: this.filmId, delIndex: delIndex},
+      {filmDetailsModal: this._filmDetailsModal, filmId: this.filmId, delCommentId: delCommentId},
     );
   }
 
