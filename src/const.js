@@ -1,3 +1,6 @@
+export const AUTHORIZATION = 'Basic gs4Sh2dqSwsl6nb2j';
+export const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';
+
 export const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
 
 export const MONTH_NAME = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -27,4 +30,5 @@ export const UpdateType = {
   PATCH_COMMENTS_LIST: 'PATCH_COMMENTS_LIST',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };

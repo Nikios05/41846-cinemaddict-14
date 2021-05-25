@@ -4,7 +4,13 @@ export const shortenText = (text) => {
   const maxTextLength = 140;
   if (text.length > maxTextLength) {
     return text.slice(0, maxTextLength - 1) + '...';
+  } else {
+    return text;
   }
+};
+
+export const convertMinToTime = (minutes) => {
+  return `${Math.trunc(minutes / 60)}h ${minutes % 60}m`;
 };
 
 export const getFullDate = (date) => {
@@ -15,8 +21,17 @@ export const getFullDate = (date) => {
   return `${day} ${MONTH_NAME[month]} ${year}`;
 };
 
-// Функция помещает задачи без даты в конце списка,
-// возвращая нужный вес для колбэка sort
+export const getFullCommentDate = (date) => {
+  const newDate = new Date(date);
+  const day = newDate.getDate();
+  const month = newDate.getMonth();
+  const year = newDate.getFullYear();
+  const hours = newDate.getHours();
+  const min = newDate.getMinutes();
+
+  return `${year}/${month}/${day} ${hours}:${min}`;
+};
+
 const getWeightForNullData = (dataA, dataB) => {
   if (dataA === null && dataB === null) {
     return 0;

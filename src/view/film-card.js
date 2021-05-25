@@ -1,19 +1,19 @@
-import {shortenText} from '../utils/film-helper';
+import {shortenText, convertMinToTime} from '../utils/film-helper';
 import AbstractView from './abstract-view';
 
-const createFilmCard = (film, comments) => {
+const createFilmCard = (film) => {
   return `
     <article class="film-card">
       <h3 class="film-card__title">${film.filmName}</h3>
       <p class="film-card__rating">${film.rating}</p>
       <p class="film-card__info">
         <span class="film-card__year">${film.releaseDate.getFullYear()}</span>
-        <span class="film-card__duration">${film.duration}</span>
+        <span class="film-card__duration">${convertMinToTime(film.duration)}</span>
         <span class="film-card__genre">${film.filmGenres[0]}</span>
       </p>
-      <img src="./images/posters/${film.posterUrl}" alt="" class="film-card__poster">
+      <img src="./${film.posterUrl}" alt="" class="film-card__poster">
       <p class="film-card__description">${shortenText(film.description)}</p>
-      <a class="film-card__comments">${comments.length} comments</a>
+      <a class="film-card__comments">${film.comments.length} comments</a>
       <div class="film-card__controls">
         <button class="film-card__controls-item button
                        film-card__controls-item--add-to-watchlist
@@ -30,11 +30,10 @@ const createFilmCard = (film, comments) => {
 };
 
 export default class FilmCard extends AbstractView {
-  constructor(film, comments) {
+  constructor(film) {
     super();
 
     this._film = film;
-    this._comments = comments;
 
     this._clickCardHandler = this._clickCardHandler.bind(this);
     this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
@@ -66,7 +65,7 @@ export default class FilmCard extends AbstractView {
   }
 
   getTemplate() {
-    return createFilmCard(this._film, this._comments);
+    return createFilmCard(this._film);
   }
 
   setClickCardHandler(callback) {

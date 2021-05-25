@@ -26,7 +26,7 @@ export default class Filter {
     this._navigationComponent.setNavItemTypeChangeHandler(this._handleNavigationTypeChange);
 
     if (prevNavigationComponent === null) {
-      render(this._navigationContainer, this._navigationComponent, RenderPosition.BEFOREEND);
+      render(this._navigationContainer, this._navigationComponent, RenderPosition.BEFOREBEGIN);
       return;
     }
 
