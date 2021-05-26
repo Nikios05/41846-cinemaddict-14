@@ -1,4 +1,4 @@
-import AbstractView from './abstract-view';
+import SmartView from './smart-view';
 
 const createFilmsList = (extraList, className, title, hiddenTitle) => {
   return `
@@ -11,7 +11,7 @@ const createFilmsList = (extraList, className, title, hiddenTitle) => {
   `;
 };
 
-export default class FilmList extends AbstractView {
+export default class FilmList extends SmartView {
   constructor(extraList, className, title, hiddenTitle = false) {
     super();
 

@@ -71,6 +71,14 @@ export default class FilmCard {
     this._filmDetailsModal.setRemoveCommentHandler(this._handleRemoveComments);
   }
 
+  _updateData(update) {
+    this._filmData = Object.assign(
+      {},
+      this._filmData,
+      update,
+    );
+  }
+
   _showDetailsFilm() {
     const api = new Api(END_POINT, AUTHORIZATION);
 
@@ -127,44 +135,32 @@ export default class FilmCard {
   }
 
   _handleWatchlistClick() {
+    this._updateData({inWatchlist: !this._filmData.inWatchlist});
+
     this._changeData(
       UserAction.UPDATE_FILM,
       this._navigationModel.getNavItem() === NavigationType.WATCHLIST ? UpdateType.MINOR : UpdateType.PATCH,
-      Object.assign(
-        {},
-        this._filmData,
-        {
-          inWatchlist: !this._filmData.inWatchlist,
-        },
-      ),
+      this._filmData,
     );
   }
 
   _handleWatchedClick() {
+    this._updateData({isWatched: !this._filmData.isWatched});
+
     this._changeData(
       UserAction.UPDATE_FILM,
       this._navigationModel.getNavItem() === NavigationType.WATCHED ? UpdateType.MINOR : UpdateType.PATCH,
-      Object.assign(
-        {},
-        this._filmData,
-        {
-          isWatched: !this._filmData.isWatched,
-        },
-      ),
+      this._filmData,
     );
   }
 
   _handleFavoriteClick() {
+    this._updateData({isFavorite: !this._filmData.isFavorite});
+
     this._changeData(
       UserAction.UPDATE_FILM,
       this._navigationModel.getNavItem() === NavigationType.FAVORITES ? UpdateType.MINOR : UpdateType.PATCH,
-      Object.assign(
-        {},
-        this._filmData,
-        {
-          isFavorite: !this._filmData.isFavorite,
-        },
-      ),
+      this._filmData,
     );
   }
 

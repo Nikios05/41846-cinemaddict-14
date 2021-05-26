@@ -7,8 +7,6 @@ import FilmsModel from './model/films';
 import NavigationModel from './model/navigation';
 import CommentsModel from './model/comments';
 
-import ProfileView from './view/profile';
-
 import FilmGridPresenter from './presenter/film-grid';
 import NavigationPresenter from './presenter/navigation';
 
@@ -22,7 +20,7 @@ const headerContainer = document.querySelector('.header');
 const mainContainer = document.querySelector('.main');
 
 const navigationPresenter = new NavigationPresenter(mainContainer, navigationModel, filmsModel);
-const filmsPresenter = new FilmGridPresenter(mainContainer, filmsModel, commentsModel, navigationModel, api);
+const filmsPresenter = new FilmGridPresenter(mainContainer, headerContainer, filmsModel, commentsModel, navigationModel, api);
 const footerStatistics = document.querySelector('.footer__statistics');
 
 const createFooterStatistic = (filmCount) => {
@@ -30,8 +28,6 @@ const createFooterStatistic = (filmCount) => {
 };
 
 filmsPresenter.init();
-
-render(headerContainer, new ProfileView(), RenderPosition.BEFOREEND);
 
 api.getFilms()
   .then((films) => {

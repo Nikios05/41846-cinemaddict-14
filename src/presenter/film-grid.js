@@ -1,13 +1,15 @@
-import {remove, render, RenderPosition} from '../utils/render';
+import {remove, render, RenderPosition, replace} from '../utils/render';
 
 import FilmListView from '../view/film-list';
+import ProfileView from '../view/profile';
 import SortView from '../view/sort';
 import FilmsGrid from '../view/films-grid';
+import StatisticsView from '../view/statistics';
 import MoreButtonView from '../view/show-more-btn';
 import LoadingView from '../view/loading.js';
 
 import FilmCardPresenter from '../presenter/film-card';
-import {SortType, UserAction, UpdateType} from '../const';
+import {SortType, UserAction, UpdateType, NavigationType} from '../const';
 import {sortFilmsDate, sortFilmsRating} from '../utils/film-helper';
 import {navItem} from '../utils/navigation';
 
@@ -15,7 +17,8 @@ const COUNT_FILMS_PER_PAGE = 5;
 const COUNT_FILMS_EXTRA_LIST = 2;
 
 export default class FilmGrid {
-  constructor(mainContainer, filmsModel, commentsModel, navigationModel, api) {
+  constructor(mainContainer, headerContainer, filmsModel, commentsModel, navigationModel, api) {
+    this._headerContainer = headerContainer;
     this._mainContainer = mainContainer;
     this._renderFilmsCount = COUNT_FILMS_PER_PAGE;
 
@@ -31,8 +34,10 @@ export default class FilmGrid {
     this._isLoading = true;
     this._api = api;
 
+    this._profileComponent = null;
     this._sortComponent = null;
     this._loadMoreButton = null;
+    this._statsComponent = null;
 
     this._filmsGrid = new FilmsGrid();
     this._allFilmsList = new FilmListView(false, 'all-list', 'All movies. Upcoming', true);
@@ -46,14 +51,14 @@ export default class FilmGrid {
     this._handleNewOpenCardModal = this._handleNewOpenCardModal.bind(this);
     this._handleMoreButtonClick = this._handleMoreButtonClick.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
-
-    this._filmsModel.addObserver(this._handleModelEvent);
-    this._commentsModel.addObserver(this._handleModelEvent);
-    this._navigationModel.addObserver(this._handleModelEvent);
   }
 
   init() {
     render(this._mainContainer, this._filmsGrid, RenderPosition.BEFOREEND);
+
+    this._filmsModel.addObserver(this._handleModelEvent);
+    this._commentsModel.addObserver(this._handleModelEvent);
+    this._navigationModel.addObserver(this._handleModelEvent);
 
     this._renderFilmsGrid();
   }
@@ -89,11 +94,23 @@ export default class FilmGrid {
       return;
     }
 
+    this._renderProfile();
     this._renderSort();
 
     this._renderAllFilms();
     this._renderTopRatedFilms();
     this._renderMostCommentsFilms();
+  }
+
+
+  _renderStats() {
+    const prevStats = this._statsComponent;
+    this._statsComponent = new StatisticsView(this._filmsModel.getFilms().filter((film) => film.isWatched));
+    if (prevStats) {
+      replace(this._statsComponent, prevStats);
+    } else {
+      render(this._mainContainer, this._statsComponent, RenderPosition.BEFOREEND);
+    }
   }
 
   _fillPresenterList(presenterList, filmsContainer, sort) {
@@ -119,6 +136,16 @@ export default class FilmGrid {
     this._allFilmPresenters.find((presenter) => presenter.filmId === data.id).init(data);
     this._topRatedFilmPresenters.find((presenter) => presenter.filmId === data.id).init(data);
     this._mostCommentsFilmPresenters.find((presenter) => presenter.filmId === data.id).init(data);
+  }
+
+  _renderProfile() {
+    if (this._profileComponent !== null) {
+      remove(this._profileComponent);
+      this._profileComponent = null;
+    }
+
+    this._profileComponent = new ProfileView(this._filmsModel.getFilms().filter((film) => film.isWatched));
+    render(this._headerContainer, this._profileComponent, RenderPosition.BEFOREEND);
   }
 
   _renderSort() {
@@ -215,7 +242,6 @@ export default class FilmGrid {
     if (update.filmId) {
       updatedFilm = this._filmsModel.getFilms().find((film) => film.id === update.filmId);
     }
-
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this._api.updateFilm(update).then((response) => {
@@ -254,6 +280,7 @@ export default class FilmGrid {
       case UpdateType.PATCH:
         // - обновить часть списка
         this._updateFoundPresenter(data);
+        this._renderProfile();
         break;
       case UpdateType.PATCH_COMMENTS_LIST:
         // - обновить часть списка и грид с наибольшими комментариями
@@ -264,14 +291,24 @@ export default class FilmGrid {
       case UpdateType.MINOR:
         // - обновить список
         this._clearFilmsGrid();
+        this._renderProfile();
         this._renderSort();
         this._renderAllFilms();
         break;
       case UpdateType.MAJOR:
         // - обновить весь грид
         this._clearFilmsGrid({resetRenderedFilmCount: true, resetSortType: true});
-        this._renderSort();
-        this._renderAllFilms();
+        if (data === NavigationType.STATS) {
+          this._renderStats();
+          this._filmsGrid.hide();
+        } else {
+          if (this._statsComponent) {
+            this._statsComponent.hide();
+          }
+          this._filmsGrid.show();
+          this._renderSort();
+          this._renderAllFilms();
+        }
         break;
       case UpdateType.INIT:
         // - обновление при инициализации с сервера
@@ -329,5 +366,18 @@ export default class FilmGrid {
 
   _renderLoading() {
     render(this._filmsGrid, this._loadingComponent, RenderPosition.AFTERBEGIN);
+  }
+
+  destroy() {
+    this._clearFilmsGrid({resetRenderedTaskCount: true, resetSortType: true});
+
+    remove(this._allFilmsList);
+    remove(this._topFilmTemplate);
+    remove(this._mostFilmTemplate);
+    remove(this._filmsGrid);
+
+    this._filmsModel.removeObserver(this._handleModelEvent);
+    this._commentsModel.removeObserver(this._handleModelEvent);
+    this._navigationModel.removeObserver(this._handleModelEvent);
   }
 }

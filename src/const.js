@@ -5,6 +5,21 @@ export const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
 
 export const MONTH_NAME = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+export const PeriodType = {
+  ALL_TIME: 'all-time',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+};
+
+export const RankType = {
+  NO_RANK: null,
+  NOVICE: 'Novice',
+  FAN: 'Fan',
+  MOVIE_BUFF: 'Movie Buff',
+};
+
 export const SortType = {
   DEFAULT: 'default',
   DATE: 'date',
