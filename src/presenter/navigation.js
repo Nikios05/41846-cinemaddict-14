@@ -1,9 +1,9 @@
 import NavigationView from '../view/navigation';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
-import {navItem} from '../utils/navigation.js';
+import {NavItem} from '../utils/navigation.js';
 import {NavigationType, UpdateType} from '../const.js';
 
-export default class Filter {
+export default class Navigation {
   constructor(navigationContainer, navigationModel, filmsModel) {
     this._navigationContainer = navigationContainer;
     this._navigationModel = navigationModel;
@@ -39,7 +39,7 @@ export default class Filter {
   }
 
   _handleNavigationTypeChange(navigationType) {
-    if (this._navigationModel.getNavItem() === navigationType) {
+    if (this._navigationModel.getNavItem() === navigationType || !this._filmsModel.getFilms().length) {
       return;
     }
 
@@ -56,17 +56,17 @@ export default class Filter {
       {
         type: NavigationType.WATCHLIST,
         name: 'watchlist',
-        count: navItem[NavigationType.WATCHLIST](films).length,
+        count: NavItem[NavigationType.WATCHLIST](films).length,
       },
       {
         type: NavigationType.WATCHED,
         name: 'watched',
-        count: navItem[NavigationType.WATCHED](films).length,
+        count: NavItem[NavigationType.WATCHED](films).length,
       },
       {
         type: NavigationType.FAVORITES,
         name: 'favorites',
-        count: navItem[NavigationType.FAVORITES](films).length,
+        count: NavItem[NavigationType.FAVORITES](films).length,
       },
       {
         type: NavigationType.STATS,

@@ -145,7 +145,10 @@ export default class FilmCard {
   }
 
   _handleWatchedClick() {
-    this._updateData({isWatched: !this._filmData.isWatched});
+    this._updateData({
+      isWatched: !this._filmData.isWatched,
+      watchedDate: new Date(),
+    });
 
     this._changeData(
       UserAction.UPDATE_FILM,

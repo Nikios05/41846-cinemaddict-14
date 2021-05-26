@@ -15,7 +15,7 @@ const getAllWatchedFilmsToday = (films, dayPeriod = 0, monthPeriod = 0, yearPeri
 };
 
 
-export const getStatsWatchedFilmsForPeriod = {
+export const GetStatsWatchedFilmsForPeriod = {
   [PeriodType.ALL_TIME]: (films) => films,
   [PeriodType.TODAY]: (films) => getAllWatchedFilmsToday(films, 1),
   [PeriodType.WEEK]: (films) => getAllWatchedFilmsToday(films, 7),

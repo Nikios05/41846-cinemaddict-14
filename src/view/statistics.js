@@ -1,13 +1,13 @@
 import SmartView from './smart-view';
 import {
-  allWatchedFilmsCount,
-  allWatchedFilmsDuration, getProfileRank,
+  getAllWatchedFilmsCount,
+  getAllWatchedFilmsDuration, getProfileRank,
   sortUpWatchedFilmsGenres
 } from '../utils/film-helper';
 
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getStatsWatchedFilmsForPeriod} from '../utils/statistic';
+import {GetStatsWatchedFilmsForPeriod} from '../utils/statistic';
 import {PeriodType} from '../const';
 
 const renderChart = (statisticCtx, films) => {
@@ -90,8 +90,8 @@ const renderChart = (statisticCtx, films) => {
 };
 
 const renderTotalDuration = (films) => {
-  const minutes = allWatchedFilmsDuration(films) % 60;
-  const hours = Math.trunc(allWatchedFilmsDuration(films) / 60);
+  const minutes = getAllWatchedFilmsDuration(films) % 60;
+  const hours = Math.trunc(getAllWatchedFilmsDuration(films) / 60);
 
   return `<p class="statistic__item-text">${hours} <span class="statistic__item-description">h</span> ${minutes} <span class="statistic__item-description">m</span></p>`;
 };
@@ -99,7 +99,7 @@ const renderTotalDuration = (films) => {
 const renderTopGenre = (films) => {
   const listGenres = sortUpWatchedFilmsGenres(films);
   const topGenre = Object.keys(listGenres).sort((a, b) => listGenres[b] - listGenres[a])[0];
-  return `<p class="statistic__item-text">${topGenre}</p>`;
+  return `<p class="statistic__item-text">${topGenre ? topGenre : ''}</p>`;
 };
 
 const renderPeriodList = (currentPeriod) => {
@@ -125,7 +125,7 @@ const createStatisticsTemplate = ({films, currentPeriod, allWatchedFilms}) => {
       <p class="statistic__rank">
         Your rank
         <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-        <span class="statistic__rank-label">${getProfileRank(allWatchedFilms)}</span>
+        <span class="statistic__rank-label">${allWatchedFilms.length ? getProfileRank(allWatchedFilms) : ''}</span>
       </p>
 
       <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
@@ -137,7 +137,7 @@ const createStatisticsTemplate = ({films, currentPeriod, allWatchedFilms}) => {
       <ul class="statistic__text-list">
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">You watched</h4>
-          <p class="statistic__item-text">${allWatchedFilmsCount(films)} <span class="statistic__item-description">movies</span></p>
+          <p class="statistic__item-text">${getAllWatchedFilmsCount(films)} <span class="statistic__item-description">movies</span></p>
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Total duration</h4>
@@ -180,7 +180,7 @@ export default class Statistics extends SmartView {
       return;
     }
     this._currentPeriod = evt.target.value;
-    const filteredFilms = getStatsWatchedFilmsForPeriod[this._currentPeriod](this._films);
+    const filteredFilms = GetStatsWatchedFilmsForPeriod[this._currentPeriod](this._films);
 
     this.updateData({
       films: filteredFilms,

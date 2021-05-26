@@ -1,5 +1,5 @@
 import {MONTH_NAME, NavigationType, RankType} from '../const';
-import {navItem} from './navigation';
+import {NavItem} from './navigation';
 
 export const shortenText = (text) => {
   const maxTextLength = 140;
@@ -33,12 +33,12 @@ export const getFullCommentDate = (date) => {
   return `${year}/${month}/${day} ${hours}:${min}`;
 };
 
-export const allWatchedFilmsCount = (films) => {
-  return navItem[NavigationType.WATCHED](films).length;
+export const getAllWatchedFilmsCount = (films) => {
+  return NavItem[NavigationType.WATCHED](films).length;
 };
 
-export const allWatchedFilmsDuration = (films) => {
-  return navItem[NavigationType.WATCHED](films).reduce((total, film) => {
+export const getAllWatchedFilmsDuration = (films) => {
+  return NavItem[NavigationType.WATCHED](films).reduce((total, film) => {
     total = total + film.duration;
     return total;
   }, 0);

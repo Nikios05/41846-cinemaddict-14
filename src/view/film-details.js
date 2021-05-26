@@ -252,8 +252,6 @@ export default class FilmDetails extends SmartView {
 
       const newComment = this._newComment();
 
-      this._deleteCurrentInputsData();
-
       this._callback.addCommentHandler(newComment);
     }
   }
@@ -279,11 +277,6 @@ export default class FilmDetails extends SmartView {
     this._callback.removeCommentHandler(evt.target.id);
   }
 
-  _deleteCurrentInputsData() {
-    delete this._data.currentCommentText;
-    delete this._data.currentCommentEmoji;
-  }
-
   _blockUsersInputs() {
     this.getElement().querySelector('.film-details__comment-input').disabled = true;
     this.getElement().querySelectorAll('.film-details__emoji-item').forEach((item) => {
@@ -298,6 +291,13 @@ export default class FilmDetails extends SmartView {
       comments: update,
       currentScroll: this.getElement().scrollTop,
     });
+
+    this._deleteCurrentInputsData();
+  }
+
+  _deleteCurrentInputsData() {
+    delete this._data.currentCommentText;
+    delete this._data.currentCommentEmoji;
   }
 
   restoreDefaultState() {
@@ -306,6 +306,11 @@ export default class FilmDetails extends SmartView {
       disabledDelBtn.disabled = false;
       disabledDelBtn.innerText = 'Delete';
     }
+
+    this.getElement().classList.add('shake');
+    setTimeout(() => {
+      this.getElement().classList.remove('shake');
+    }, 300);
 
     this.getElement().querySelector('.film-details__comment-input').disabled = false;
     this.getElement().querySelectorAll('.film-details__emoji-item').forEach((item) => {

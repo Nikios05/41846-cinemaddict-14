@@ -1,6 +1,6 @@
 import {NavigationType} from '../const';
 
-export const navItem = {
+export const NavItem = {
   [NavigationType.ALL]: (films) => films,
   [NavigationType.WATCHLIST]: (films) => films.filter((film) => film.inWatchlist),
   [NavigationType.WATCHED]: (films) => films.filter((film) => film.isWatched),

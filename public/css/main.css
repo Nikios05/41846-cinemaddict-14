@@ -1104,3 +1104,13 @@ button {
   padding-top: 50px;
   padding-bottom: 50px;
 }
+.shake {
+  animation: 0.1s shake ease-out infinite;
+}
+
+@-webkit-keyframes shake {
+  0% { transform: translate(-2px, 2px); }
+  33% { transform: translate(-2px, 4px); }
+  66% { transform: translate(-4px, 4px); }
+  100% { transform: translate(-4px, 2px); }
+}
