@@ -10,7 +10,7 @@ import FilmsGrid from '../view/films-grid';
 import StatisticsView from '../view/statistics';
 import MoreButtonView from '../view/show-more-btn';
 import LoadingView from '../view/loading.js';
-import NoFilmsPlaceholder from '../view/noFilmsPlaceholder';
+import NoFilmsPlaceholder from '../view/no-films-placeholder';
 
 import FilmCardPresenter from '../presenter/film-card';
 
