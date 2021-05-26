@@ -1,10 +1,10 @@
-import AbstractView from './abstract-view';
+import SmartView from './smart-view';
 
 const createFilmsTemplate = () => {
   return '<section class="films"></section>';
 };
 
-export default class FilmsGrid extends AbstractView {
+export default class FilmsGrid extends SmartView {
   getTemplate() {
     return createFilmsTemplate();
   }

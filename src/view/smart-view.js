@@ -43,4 +43,12 @@ export default class Smart extends AbstractView {
   restoreHandlers() {
     throw new Error('Abstract method not implemented: resetHandlers');
   }
+
+  show() {
+    this.getElement().classList.remove('visually-hidden');
+  }
+
+  hide() {
+    this.getElement().classList.add('visually-hidden');
+  }
 }

@@ -1,4 +1,5 @@
-import {MONTH_NAME} from '../const';
+import {MONTH_NAME, NavigationType, RankType} from '../const';
+import {navItem} from './navigation';
 
 export const shortenText = (text) => {
   const maxTextLength = 140;
@@ -30,6 +31,48 @@ export const getFullCommentDate = (date) => {
   const min = newDate.getMinutes();
 
   return `${year}/${month}/${day} ${hours}:${min}`;
+};
+
+export const allWatchedFilmsCount = (films) => {
+  return navItem[NavigationType.WATCHED](films).length;
+};
+
+export const allWatchedFilmsDuration = (films) => {
+  return navItem[NavigationType.WATCHED](films).reduce((total, film) => {
+    total = total + film.duration;
+    return total;
+  }, 0);
+};
+
+export const sortUpWatchedFilmsGenres = (films) => {
+  const listGenres = {};
+
+  const arrayAllGenres = films.reduce((total, film) => {
+    total.push(...film.filmGenres);
+    return total;
+  }, []);
+
+  arrayAllGenres.forEach((item) => {
+    listGenres[item] = (listGenres[item] || 0) + 1;
+  });
+
+  return listGenres;
+};
+
+export const getProfileRank = (watchedFilms) => {
+  const count = watchedFilms.length;
+  if (count === 0) {
+    return;
+  }
+  if (count >= 1 && count <= 10) {
+    return RankType.NOVICE;
+  }
+  if (count >= 11 && count <= 20) {
+    return RankType.FAN;
+  }
+  if (count >= 21) {
+    return RankType.MOVIE_BUFF;
+  }
 };
 
 const getWeightForNullData = (dataA, dataB) => {

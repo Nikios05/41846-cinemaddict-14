@@ -200,6 +200,7 @@ export default class FilmDetails extends SmartView {
     evt.preventDefault();
     this.updateData({
       inWatchlist: !this._data.inWatchlist,
+      currentScroll: this.getElement().scrollTop,
     });
 
     this._callback.watchlistClick();
@@ -209,6 +210,7 @@ export default class FilmDetails extends SmartView {
     evt.preventDefault();
     this.updateData({
       isWatched: !this._data.isWatched,
+      currentScroll: this.getElement().scrollTop,
     });
 
     this._callback.watchedClick();
@@ -218,6 +220,7 @@ export default class FilmDetails extends SmartView {
     evt.preventDefault();
     this.updateData({
       isFavorite: !this._data.isFavorite,
+      currentScroll: this.getElement().scrollTop,
     });
 
     this._callback.favoriteClick();
