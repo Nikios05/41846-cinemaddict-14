@@ -3,7 +3,7 @@ export const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';
 
 export const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
 
-export const MONTH_NAME = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+export const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 export const PeriodType = {
   ALL_TIME: 'all-time',
@@ -27,6 +27,14 @@ export const SortType = {
 };
 
 export const NavigationType = {
+  ALL: 'all_movies',
+  WATCHLIST: 'watchlist',
+  WATCHED: 'watched',
+  FAVORITES: 'favorites',
+  STATS: 'stats',
+};
+
+export const NavigationTypeText = {
   ALL: 'All movies',
   WATCHLIST: 'watchlist',
   WATCHED: 'watched',

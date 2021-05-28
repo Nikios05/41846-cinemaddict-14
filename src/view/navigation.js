@@ -1,5 +1,5 @@
 import AbstractView from './abstract-view';
-import {NavigationType} from '../const';
+import {NavigationTypeText} from '../const';
 
 const createNavItemTemplate = (navItem, currentNavigationType) => {
   const {type, name, count} = navItem;
@@ -10,10 +10,10 @@ const createNavItemTemplate = (navItem, currentNavigationType) => {
   }
 
   return `<a href="#${name}"
-             id="${name}"
+             id="${type}"
              class="
                 main-navigation__link
-                ${name === NavigationType.STATS ? 'main-navigation__additional' : 'main-navigation__item'}
+                ${name === NavigationTypeText.STATS ? 'main-navigation__additional' : 'main-navigation__item'}
                 ${type === currentNavigationType ? 'main-navigation__item--active' : ''}"
           >${name} ${countTemplate}</a>`;
 };
@@ -29,17 +29,17 @@ const createNavigationTemplate = (navItems, currentNavigationType) => {
 };
 
 export default class Navigation extends AbstractView {
-  constructor(filters, currentNavigationType) {
+  constructor(navItems, currentNavigationType) {
     super();
 
-    this._filters = filters;
+    this._navItems = navItems;
     this._currentNavItem = currentNavigationType;
 
     this._navItemTypeChangeHandler = this._navItemTypeChangeHandler.bind(this);
   }
 
   getTemplate() {
-    return createNavigationTemplate(this._filters, this._currentNavItem);
+    return createNavigationTemplate(this._navItems, this._currentNavItem);
   }
 
   _navItemTypeChangeHandler(evt) {

@@ -1,18 +1,5 @@
 import {PeriodType} from '../const';
-
-const getAllWatchedFilmsToday = (films, dayPeriod = 0, monthPeriod = 0, yearPeriod = 0) => {
-  const nowDate = new Date();
-
-  const year = nowDate.getFullYear();
-  const month = nowDate.getMonth();
-  const day = nowDate.getDate();
-
-  const finalDate = new Date(year - yearPeriod, month - monthPeriod, day - dayPeriod);
-
-  return films.slice().filter((film) => {
-    return film.watchedDate > finalDate;
-  });
-};
+import {getAllWatchedFilmsToday} from './film-helper';
 
 
 export const GetStatsWatchedFilmsForPeriod = {

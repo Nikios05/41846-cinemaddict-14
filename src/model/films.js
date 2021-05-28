@@ -43,34 +43,34 @@ export default class Films extends Observer {
   }
 
   static adaptToClient(film) {
-    const filmInfo = film.film_info;
-    const filmUserDetails = film.user_details;
+    const filmInfo = film['film_info'];
+    const filmUserDetails = film['user_details'];
     const adaptedFilm = Object.assign(
       {},
       film,
       {
         posterUrl: filmInfo.poster,
         filmName: filmInfo.title,
-        originFilmName: filmInfo.alternative_title,
-        rating: filmInfo.total_rating,
+        originFilmName: filmInfo['alternative_title'],
+        rating: filmInfo['total_rating'],
         releaseDate: new Date(filmInfo.release.date),
-        country: filmInfo.release.release_country,
+        country: filmInfo.release['release_country'],
         duration: filmInfo.runtime,
         filmGenres: filmInfo.genre,
         description: filmInfo.description,
         director: filmInfo.director,
         screenwriters: filmInfo.writers,
         cast: filmInfo.actors,
-        ageRating: filmInfo.age_rating,
+        ageRating: filmInfo['age_rating'],
         inWatchlist: filmUserDetails.watchlist,
-        isWatched: filmUserDetails.already_watched,
-        watchedDate: new Date(filmUserDetails.watching_date),
+        isWatched: filmUserDetails['already_watched'],
+        watchedDate: new Date(filmUserDetails['watching_date']),
         isFavorite: filmUserDetails.favorite,
       },
     );
 
-    delete adaptedFilm.film_info;
-    delete adaptedFilm.user_details;
+    delete adaptedFilm['film_info'];
+    delete adaptedFilm['user_details'];
 
     return adaptedFilm;
   }

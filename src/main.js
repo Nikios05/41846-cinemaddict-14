@@ -1,4 +1,4 @@
-import {createElement, render, RenderPosition} from './utils/render';
+import {render, RenderPosition} from './utils/render';
 
 import Api from './api.js';
 import {END_POINT, AUTHORIZATION, UpdateType} from './const';
@@ -10,6 +10,8 @@ import CommentsModel from './model/comments';
 import FilmGridPresenter from './presenter/film-grid';
 import NavigationPresenter from './presenter/navigation';
 
+import FooterCounter from './view/footer-counter';
+
 const api = new Api(END_POINT, AUTHORIZATION);
 
 const navigationModel = new NavigationModel();
@@ -18,14 +20,10 @@ const commentsModel = new CommentsModel();
 
 const headerContainer = document.querySelector('.header');
 const mainContainer = document.querySelector('.main');
+const footerStatistics = document.querySelector('.footer__statistics');
 
 const navigationPresenter = new NavigationPresenter(mainContainer, navigationModel, filmsModel);
 const filmsPresenter = new FilmGridPresenter(mainContainer, headerContainer, filmsModel, commentsModel, navigationModel, api);
-const footerStatistics = document.querySelector('.footer__statistics');
-
-const createFooterStatistic = (filmCount) => {
-  return createElement(`<p>${filmCount} movies inside</p>`);
-};
 
 filmsPresenter.init();
 
@@ -38,5 +36,5 @@ api.getFilms()
   })
   .then(() => {
     navigationPresenter.init();
-    render(footerStatistics, createFooterStatistic(filmsModel.getFilms().length), RenderPosition.AFTERBEGIN);
+    render(footerStatistics, new FooterCounter(filmsModel.getFilms()), RenderPosition.AFTERBEGIN);
   });

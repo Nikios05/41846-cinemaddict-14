@@ -68,16 +68,16 @@ export default class FilmGrid {
   _getFilms() {
     const navigationType = this._navigationModel.getNavItem();
     const films = this._filmsModel.getFilms();
-    const filtredFilms = NavItem[navigationType](films);
+    const filteredFilms = NavItem[navigationType](films).slice();
 
     switch (this._currentSortType) {
       case SortType.DATE:
-        return filtredFilms.sort(sortFilmsDate);
+        return filteredFilms.sort(sortFilmsDate);
       case SortType.RATING:
-        return filtredFilms.sort(sortFilmsRating);
+        return filteredFilms.sort(sortFilmsRating);
+      default:
+        return filteredFilms;
     }
-
-    return filtredFilms;
   }
 
   get _countFilms() {

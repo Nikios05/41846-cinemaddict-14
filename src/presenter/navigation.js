@@ -1,7 +1,7 @@
 import NavigationView from '../view/navigation';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {NavItem} from '../utils/navigation.js';
-import {NavigationType, UpdateType} from '../const.js';
+import {NavigationType, NavigationTypeText, UpdateType} from '../const.js';
 
 export default class Navigation {
   constructor(navigationContainer, navigationModel, filmsModel) {
@@ -51,26 +51,26 @@ export default class Navigation {
     return [
       {
         type: NavigationType.ALL,
-        name: 'All movies',
+        name: NavigationTypeText.ALL,
       },
       {
         type: NavigationType.WATCHLIST,
-        name: 'watchlist',
+        name: NavigationTypeText.WATCHLIST,
         count: NavItem[NavigationType.WATCHLIST](films).length,
       },
       {
         type: NavigationType.WATCHED,
-        name: 'watched',
+        name: NavigationTypeText.WATCHED,
         count: NavItem[NavigationType.WATCHED](films).length,
       },
       {
         type: NavigationType.FAVORITES,
-        name: 'favorites',
+        name: NavigationTypeText.FAVORITES,
         count: NavItem[NavigationType.FAVORITES](films).length,
       },
       {
         type: NavigationType.STATS,
-        name: 'Stats',
+        name: NavigationTypeText.STATS,
       },
     ];
   }

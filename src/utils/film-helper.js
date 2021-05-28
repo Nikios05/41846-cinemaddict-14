@@ -1,4 +1,4 @@
-import {MONTH_NAME, NavigationType, RankType} from '../const';
+import {MONTH_NAMES, NavigationType, RankType} from '../const';
 import {NavItem} from './navigation';
 
 export const shortenText = (text) => {
@@ -19,7 +19,7 @@ export const getFullDate = (date) => {
   const month = date.getMonth();
   const year = date.getFullYear();
 
-  return `${day} ${MONTH_NAME[month]} ${year}`;
+  return `${day} ${MONTH_NAMES[month]} ${year}`;
 };
 
 export const getFullCommentDate = (date) => {
@@ -42,6 +42,20 @@ export const getAllWatchedFilmsDuration = (films) => {
     total = total + film.duration;
     return total;
   }, 0);
+};
+
+export const getAllWatchedFilmsToday = (films, dayPeriod = 0, monthPeriod = 0, yearPeriod = 0) => {
+  const nowDate = new Date();
+
+  const year = nowDate.getFullYear();
+  const month = nowDate.getMonth();
+  const day = nowDate.getDate();
+
+  const finalDate = new Date(year - yearPeriod, month - monthPeriod, day - dayPeriod);
+
+  return films.slice().filter((film) => {
+    return film.watchedDate > finalDate;
+  });
 };
 
 export const sortUpWatchedFilmsGenres = (films) => {
