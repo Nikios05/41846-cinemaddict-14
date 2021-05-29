@@ -298,10 +298,10 @@ export default class FilmDetails extends SmartView {
     }, SHAKE_DURATION);
   }
 
-  restoreDefaultState(is_input = false) {
+  restoreDefaultState(isInput = false) {
     const disabledDelBtn = this.getElement().querySelector('.film-details__comment-delete--disabled');
     const commentInput = this.getElement().querySelector('.film-details__comment-input');
-    const shakingComponent = is_input ? commentInput : this.getElement();
+    const shakingComponent = isInput ? commentInput : this.getElement();
 
     if (disabledDelBtn) {
       disabledDelBtn.disabled = false;
