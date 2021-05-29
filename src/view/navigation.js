@@ -44,7 +44,7 @@ export default class Navigation extends AbstractView {
 
   _navItemTypeChangeHandler(evt) {
     evt.preventDefault();
-    this._callback.navItemTypeChange(evt.target.id);
+    this._callback.navItemTypeChange(evt.target.id || evt.target.parentElement.id);
   }
 
   setNavItemTypeChangeHandler(callback) {

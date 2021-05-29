@@ -10,6 +10,8 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {GetStatsWatchedFilmsForPeriod} from '../utils/statistic';
 import {PeriodType} from '../const';
 
+const BAR_HEIGHT = 50;
+
 const renderChart = (statisticCtx, films) => {
 
   if (films.length === 0) {
@@ -26,8 +28,6 @@ const renderChart = (statisticCtx, films) => {
       genres.push(label);
       counts.push(count);
     });
-
-  const BAR_HEIGHT = 50;
 
   statisticCtx.height = BAR_HEIGHT * Object.values(genres).length;
 

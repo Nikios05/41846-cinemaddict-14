@@ -1,10 +1,9 @@
-import {MONTH_NAMES, NavigationType, RankType} from '../const';
+import {GapsProfileRank, MAX_DESCRIPTION_LENGTH, MONTH_NAMES, NavigationType, RankType} from '../const';
 import {NavItem} from './navigation';
 
 export const shortenText = (text) => {
-  const maxTextLength = 140;
-  if (text.length > maxTextLength) {
-    return text.slice(0, maxTextLength - 1) + '...';
+  if (text.length > MAX_DESCRIPTION_LENGTH) {
+    return text.slice(0, MAX_DESCRIPTION_LENGTH - 1) + '...';
   } else {
     return text;
   }
@@ -78,13 +77,13 @@ export const getProfileRank = (watchedFilms) => {
   if (count === 0) {
     return;
   }
-  if (count >= 1 && count <= 10) {
+  if (count >= GapsProfileRank.NOVICE_MIN && count <= GapsProfileRank.NOVICE_MAX) {
     return RankType.NOVICE;
   }
-  if (count >= 11 && count <= 20) {
+  if (count >= GapsProfileRank.FAN_MIN && count <= GapsProfileRank.FAN_MAX) {
     return RankType.FAN;
   }
-  if (count >= 21) {
+  if (count >= GapsProfileRank.MOVIE_BUFF_MIN) {
     return RankType.MOVIE_BUFF;
   }
 };

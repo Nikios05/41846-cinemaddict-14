@@ -1,5 +1,5 @@
 import {remove, render, RenderPosition, replace} from '../utils/render';
-import {SortType, UserAction, UpdateType, NavigationType} from '../const';
+import {SortType, UserAction, UpdateType, NavigationType, COUNT_FILMS_PER_PAGE, COUNT_FILMS_EXTRA_LIST} from '../const';
 import {sortFilmsDate, sortFilmsRating} from '../utils/film-helper';
 import {NavItem} from '../utils/navigation';
 
@@ -8,14 +8,11 @@ import ProfileView from '../view/profile';
 import SortView from '../view/sort';
 import FilmsGrid from '../view/films-grid';
 import StatisticsView from '../view/statistics';
-import MoreButtonView from '../view/show-more-btn';
+import MoreButtonView from '../view/more-btn';
 import LoadingView from '../view/loading.js';
 import NoFilmsPlaceholder from '../view/no-films-placeholder';
 
 import FilmCardPresenter from '../presenter/film-card';
-
-const COUNT_FILMS_PER_PAGE = 5;
-const COUNT_FILMS_EXTRA_LIST = 2;
 
 export default class FilmGrid {
   constructor(mainContainer, headerContainer, filmsModel, commentsModel, navigationModel, api) {
@@ -100,11 +97,11 @@ export default class FilmGrid {
 
     this._renderAllFilms();
 
-    if (this._filmsModel.getFilms().every((film) => film.rating > 0)) {
+    if (this._filmsModel.getFilms().some((film) => film.rating > 0)) {
       this._renderTopRatedFilms();
     }
 
-    if (this._filmsModel.getFilms().every((film) => film.comments.length > 0)) {
+    if (this._filmsModel.getFilms().some((film) => film.comments.length > 0)) {
       this._renderMostCommentsFilms();
     }
   }
@@ -122,7 +119,7 @@ export default class FilmGrid {
 
   _fillPresenterList(presenterList, filmsContainer, sort) {
     const insertContainer = filmsContainer.getElement().querySelector('.films-list__container');
-    let allFilms = this._getFilms().slice();
+    let allFilms = this._filmsModel.getFilms().slice();
 
     if (sort) {
       allFilms = sort === 'comments'
@@ -140,7 +137,9 @@ export default class FilmGrid {
   }
 
   _updateFoundPresenter(data) {
-    this._allFilmPresenters.find((presenter) => presenter.filmId === data.id).init(data);
+    if (this._allFilmPresenters.length) {
+      this._allFilmPresenters.find((presenter) => presenter.filmId === data.id).init(data);
+    }
     this._topRatedFilmPresenters.find((presenter) => presenter.filmId === data.id).init(data);
     this._mostCommentsFilmPresenters.find((presenter) => presenter.filmId === data.id).init(data);
   }
@@ -192,10 +191,10 @@ export default class FilmGrid {
   _renderTopRatedFilms() {
     render(this._filmsGrid, this._topFilmTemplate, RenderPosition.BEFOREEND);
 
-    const films = this._getFilms()
+    const films = this._filmsModel.getFilms()
       .slice()
       .sort((a, b) => b.rating - a.rating)
-      .slice(0, Math.min(this._countFilms, COUNT_FILMS_EXTRA_LIST));
+      .slice(0, COUNT_FILMS_EXTRA_LIST);
 
     if (!this._topRatedFilmPresenters.length) {
       this._fillPresenterList(this._topRatedFilmPresenters, this._topFilmTemplate, 'rating');
@@ -207,10 +206,10 @@ export default class FilmGrid {
   _renderMostCommentsFilms() {
     render(this._filmsGrid, this._mostFilmTemplate, RenderPosition.BEFOREEND);
 
-    const films = this._getFilms()
+    const films = this._filmsModel.getFilms()
       .slice()
       .sort((a, b) => b.comments.length - a.comments.length)
-      .slice(0, Math.min(this._countFilms, COUNT_FILMS_EXTRA_LIST));
+      .slice(0, COUNT_FILMS_EXTRA_LIST);
 
     if (!this._mostCommentsFilmPresenters.length) {
       this._fillPresenterList(this._mostCommentsFilmPresenters, this._mostFilmTemplate, 'comments');
@@ -256,24 +255,22 @@ export default class FilmGrid {
         });
         break;
       case UserAction.ADD_COMMENT:
-        this._commentsModel.setFilmComments(updatedFilm.comments);
         this._api.addComment(updatedFilm, update.newComment)
           .then((comments) => {
-            this._commentsModel.addComment(comments);
-            this._filmsModel.updateFilmComments(updateType, updatedFilm, this._commentsModel.getFilmComments());
+            this._commentsModel.updateComments(comments);
+            this._filmsModel.updateFilmComments(updateType, updatedFilm, comments);
             update.filmDetailsModal.updateDetailFilmModal(comments);
           })
           .catch(() => {
-            update.filmDetailsModal.restoreDefaultState();
+            update.filmDetailsModal.restoreDefaultState(true);
           });
         break;
       case UserAction.REMOVE_COMMENT:
-        this._commentsModel.setFilmComments(updatedFilm.comments);
         this._api.removeComment(update.delCommentId)
           .then(() => {
             this._commentsModel.removeComment(update.delCommentId);
             this._filmsModel.updateFilmComments(updateType, updatedFilm, this._commentsModel.getFilmComments());
-            update.filmDetailsModal.updateElement();
+            update.filmDetailsModal.updateDetailFilmModal(this._commentsModel.getFilmComments());
           })
           .catch(() => {
             update.filmDetailsModal.restoreDefaultState();
@@ -298,9 +295,7 @@ export default class FilmGrid {
       case UpdateType.MINOR:
         // - обновить список
         this._clearFilmsGrid();
-        this._renderProfile();
-        this._renderSort();
-        this._renderAllFilms();
+        this._updatedPageComponent();
         break;
       case UpdateType.MAJOR:
         // - обновить весь грид
@@ -313,8 +308,7 @@ export default class FilmGrid {
             this._statsComponent.hide();
           }
           this._filmsGrid.show();
-          this._renderSort();
-          this._renderAllFilms();
+          this._updatedPageComponent();
         }
         break;
       case UpdateType.INIT:
@@ -377,6 +371,16 @@ export default class FilmGrid {
 
   _renderNoFilms() {
     render(this._filmsGrid, this._noFilmsComponent, RenderPosition.AFTERBEGIN);
+  }
+
+  _updatedPageComponent() {
+    this._renderProfile();
+    if (this._getFilms().length) {
+      this._renderSort();
+      this._renderAllFilms();
+    } else {
+      this._renderNoFilms();
+    }
   }
 
   destroy() {

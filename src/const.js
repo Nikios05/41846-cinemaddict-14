@@ -1,6 +1,11 @@
 export const AUTHORIZATION = 'Basic gs4Sh2dqSwsl6nb2j';
 export const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';
 
+export const COUNT_FILMS_PER_PAGE = 5;
+export const COUNT_FILMS_EXTRA_LIST = 2;
+export const SHAKE_DURATION = 300;
+export const MAX_DESCRIPTION_LENGTH = 140;
+
 export const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
 
 export const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -18,6 +23,14 @@ export const RankType = {
   NOVICE: 'Novice',
   FAN: 'Fan',
   MOVIE_BUFF: 'Movie Buff',
+};
+
+export const GapsProfileRank = {
+  NOVICE_MIN: 1,
+  NOVICE_MAX: 10,
+  FAN_MIN: 11,
+  FAN_MAX: 20,
+  MOVIE_BUFF_MIN: 21,
 };
 
 export const SortType = {

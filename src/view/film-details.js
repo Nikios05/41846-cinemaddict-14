@@ -1,6 +1,6 @@
 import {convertMinToTime, getFullDate, getFullCommentDate} from '../utils/film-helper';
 import SmartView from './smart-view';
-import {EMOTIONS} from '../const';
+import {EMOTIONS, SHAKE_DURATION} from '../const';
 import he from 'he';
 
 const renderFilmGenres = (genres) => {
@@ -243,12 +243,8 @@ export default class FilmDetails extends SmartView {
 
   _commentSendHandler(evt) {
     if ((evt.metaKey || evt.ctrlKey) && evt.key === 'Enter') {
-      this._blockUsersInputs();
 
-      if (!this._data.currentCommentEmoji || !this._data.currentCommentText) {
-        alert('Для добавления комментария, нужно выбрать эмоцию и ввести текст в поле ввода');
-        return ;
-      }
+      this._blockUsersInputs();
 
       const newComment = this._newComment();
 
@@ -269,11 +265,6 @@ export default class FilmDetails extends SmartView {
     evt.target.disabled = true;
     evt.target.classList.add('film-details__comment-delete--disabled');
 
-    const delIndex = this._comments.findIndex((comment) => comment.id === evt.target.id);
-    this._comments.splice(delIndex, 1);
-
-    this._data.currentScroll = this.getElement().scrollTop;
-
     this._callback.removeCommentHandler(evt.target.id);
   }
 
@@ -287,12 +278,12 @@ export default class FilmDetails extends SmartView {
   updateDetailFilmModal(update) {
     this._comments = update;
 
+    this._deleteCurrentInputsData();
+
     this.updateData({
       comments: update,
       currentScroll: this.getElement().scrollTop,
     });
-
-    this._deleteCurrentInputsData();
   }
 
   _deleteCurrentInputsData() {
@@ -300,19 +291,26 @@ export default class FilmDetails extends SmartView {
     delete this._data.currentCommentEmoji;
   }
 
-  restoreDefaultState() {
+  _shakeComponent(element) {
+    element.classList.add('shake');
+    setTimeout(() => {
+      element.classList.remove('shake');
+    }, SHAKE_DURATION);
+  }
+
+  restoreDefaultState(is_input = false) {
     const disabledDelBtn = this.getElement().querySelector('.film-details__comment-delete--disabled');
+    const commentInput = this.getElement().querySelector('.film-details__comment-input');
+    const shakingComponent = is_input ? commentInput : this.getElement();
+
     if (disabledDelBtn) {
       disabledDelBtn.disabled = false;
       disabledDelBtn.innerText = 'Delete';
     }
 
-    this.getElement().classList.add('shake');
-    setTimeout(() => {
-      this.getElement().classList.remove('shake');
-    }, 300);
+    this._shakeComponent(shakingComponent);
 
-    this.getElement().querySelector('.film-details__comment-input').disabled = false;
+    commentInput.disabled = false;
     this.getElement().querySelectorAll('.film-details__emoji-item').forEach((item) => {
       item.disabled = false;
     });

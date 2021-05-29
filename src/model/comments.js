@@ -14,12 +14,12 @@ export default class Comments extends Observer {
     return this._comments;
   }
 
-  addComment(comments) {
+  updateComments(comments) {
     this._comments = comments;
   }
 
   removeComment(delCommentId) {
-    const delIndex = this._comments.findIndex((id) => id === delCommentId);
+    const delIndex = this._comments.findIndex((comment) => comment.id === delCommentId);
     this._comments = [
       ...this._comments.slice(0, delIndex),
       ...this._comments.slice(delIndex + 1),
