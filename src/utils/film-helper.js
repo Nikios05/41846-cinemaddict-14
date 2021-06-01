@@ -1,4 +1,4 @@
-import {GapsProfileRank, MAX_DESCRIPTION_LENGTH, MONTH_NAMES, NavigationType, RankType} from '../const';
+import {GapsProfileRank, MAX_DESCRIPTION_LENGTH, MONTH_NAMES, NavigationType, RankType, FormattedPeriod} from '../const';
 import {NavItem} from './navigation';
 
 export const shortenText = (text) => {
@@ -21,15 +21,59 @@ export const getFullDate = (date) => {
   return `${day} ${MONTH_NAMES[month]} ${year}`;
 };
 
-export const getFullCommentDate = (date) => {
-  const newDate = new Date(date);
-  const day = newDate.getDate();
-  const month = newDate.getMonth();
-  const year = newDate.getFullYear();
-  const hours = newDate.getHours();
-  const min = newDate.getMinutes();
 
-  return `${year}/${month}/${day} ${hours}:${min}`;
+const getPeriodDate = (
+  date,
+  yearPeriod = 0,
+  monthPeriod = 0,
+  dayPeriod = 0,
+  hoursPeriod = 0,
+  minPeriod = 0,
+) => {
+  const nowDate = new Date(date);
+
+  const nowYear = nowDate.getFullYear();
+  const nowMonth = nowDate.getMonth();
+  const nowDay = nowDate.getDate();
+  const nowHours = nowDate.getHours();
+  const nowMin = nowDate.getMinutes();
+
+  return  new Date(nowYear + yearPeriod, nowMonth + monthPeriod, nowDay + dayPeriod, nowHours + hoursPeriod, nowMin + minPeriod);
+};
+
+export const getFormattedCommentDate = (date) => {
+  const newDate = new Date(date);
+
+  if (new Date() <= getPeriodDate(newDate, 0,0,0,0, FormattedPeriod.MINUTES_NOW)) {
+    return 'now';
+  }
+
+  if (new Date() <= getPeriodDate(newDate,0,0,0,0, FormattedPeriod.MINUTES_FEW)) {
+    return 'a few minutes ago';
+  }
+
+  if (new Date() <= getPeriodDate(newDate,0,0,0,0, FormattedPeriod.MINUTES)) {
+    return `${new Date((new Date() - newDate)).getMinutes()} minutes ago`;
+  }
+
+  const compareYear = Math.abs(new Date().getFullYear() - newDate.getFullYear());
+  if (new Date() < getPeriodDate(newDate,FormattedPeriod.YEAR,0,0,0, 0) && compareYear !== 0) {
+    return `${compareYear} year(s) ago`;
+  }
+
+  const compareMonth = Math.abs(new Date().getMonth() - newDate.getMonth());
+  if (new Date() <= getPeriodDate(newDate,0,FormattedPeriod.MONTH,0,0, 0) && compareMonth !== 0) {
+    return `${compareMonth} month(s) ago`;
+  }
+
+  const compareDay = Math.abs(new Date().getDay() - newDate.getDay());
+  if (new Date() <= getPeriodDate(newDate,0,0,FormattedPeriod.DAYS,0, 0) && compareDay !== 0) {
+    return `${compareDay} day(s) ago`;
+  }
+
+  if (new Date() <= getPeriodDate(newDate,0,0,0,FormattedPeriod.HOURS, 0)) {
+    return `${new Date((new Date() - newDate)).getHours()} hour(s) ago`;
+  }
 };
 
 export const getAllWatchedFilmsCount = (films) => {
@@ -43,7 +87,7 @@ export const getAllWatchedFilmsDuration = (films) => {
   }, 0);
 };
 
-export const getAllWatchedFilmsToday = (films, dayPeriod = 0, monthPeriod = 0, yearPeriod = 0) => {
+export const getAllWatchedFilmsFromPeriod = (films, dayPeriod = 0, monthPeriod = 0, yearPeriod = 0) => {
   const nowDate = new Date();
 
   const year = nowDate.getFullYear();

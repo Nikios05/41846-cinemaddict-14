@@ -1104,6 +1104,25 @@ button {
   padding-top: 50px;
   padding-bottom: 50px;
 }
+
+.toast-container {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+}
+
+.toast-item {
+  padding: 8px 16px;
+  border-radius: 4px;
+  background-color: white;
+  color: black;
+  animation: 0.3s show-toast ease-out;
+}
+
 .shake {
   animation: 0.1s shake ease-out infinite;
 }
@@ -1113,4 +1132,9 @@ button {
   33% { transform: translate(-2px, 4px); }
   66% { transform: translate(-4px, 4px); }
   100% { transform: translate(-4px, 2px); }
+}
+
+@-webkit-keyframes show-toast {
+  0% { opacity: 0 }
+  100% { opacity: 1 }
 }

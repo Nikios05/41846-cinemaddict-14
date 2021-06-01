@@ -1,6 +1,10 @@
 export const AUTHORIZATION = 'Basic gs4Sh2dqSwsl6nb2j';
 export const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';
 
+export const STORE_PREFIX = 'cinemaddict-localstorage';
+export const STORE_VER = 'v14';
+export const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+
 export const COUNT_FILMS_PER_PAGE = 5;
 export const COUNT_FILMS_EXTRA_LIST = 2;
 export const SHAKE_DURATION = 300;
@@ -16,6 +20,16 @@ export const PeriodType = {
   WEEK: 'week',
   MONTH: 'month',
   YEAR: 'year',
+};
+
+export const FormattedPeriod = {
+  MINUTES_NOW: 1,
+  MINUTES_FEW: 5,
+  MINUTES: 59,
+  HOURS: 24,
+  DAYS: 31,
+  MONTH: 12,
+  YEAR: 10,
 };
 
 export const RankType = {

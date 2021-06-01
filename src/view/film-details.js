@@ -1,7 +1,8 @@
-import {convertMinToTime, getFullDate, getFullCommentDate} from '../utils/film-helper';
+import {convertMinToTime, getFullDate, getFormattedCommentDate} from '../utils/film-helper';
 import SmartView from './smart-view';
 import {EMOTIONS, SHAKE_DURATION} from '../const';
 import he from 'he';
+import {isOnline} from '../utils/common';
 
 const renderFilmGenres = (genres) => {
   return genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
@@ -17,7 +18,7 @@ const renderComment = ({id, emotion, text, author, date}) => {
         <p class="film-details__comment-text">${text}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
-          <span class="film-details__comment-day">${getFullCommentDate(date)}</span>
+          <span class="film-details__comment-day">${getFormattedCommentDate(date)}</span>
           <button class="film-details__comment-delete" id="${id}">Delete</button>
         </p>
       </div>
@@ -43,7 +44,12 @@ const renderSelectEmoji = (selectEmoji) => {
 };
 
 const createFilmDetails = (film, comments) => {
-  const commentsTemplate = comments.map((comment) => renderComment(comment)).join('');
+  let commentsTemplate;
+  if (comments.length) {
+    commentsTemplate = comments.map((comment) => renderComment(comment)).join('');
+  } else {
+    commentsTemplate = `<p class="film-details__comment-text">${isOnline() ? 'Добавьте первый комментарий.' : 'Нет сети для отображения комментариев.'}</p>`;
+  }
 
   const emotionsListTemplate = createEmotionsList(film.currentCommentEmoji);
 
@@ -159,7 +165,7 @@ export default class FilmDetails extends SmartView {
     super();
 
     this._data = film;
-    this._comments = comments;
+    this._comments = comments || [];
 
     this._clickCloseHandler = this._clickCloseHandler.bind(this);
     this._watchlistToggleHandler = this._watchlistToggleHandler.bind(this);

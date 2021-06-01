@@ -13,6 +13,8 @@ import LoadingView from '../view/loading.js';
 import NoFilmsPlaceholder from '../view/no-films-placeholder';
 
 import FilmCardPresenter from '../presenter/film-card';
+import {isOnline} from '../utils/common';
+import {toast} from '../utils/toast';
 
 export default class FilmGrid {
   constructor(mainContainer, headerContainer, filmsModel, commentsModel, navigationModel, api) {
@@ -255,6 +257,11 @@ export default class FilmGrid {
         });
         break;
       case UserAction.ADD_COMMENT:
+        if (!isOnline()) {
+          toast('You can\'t create new comment offline');
+          update.filmDetailsModal.restoreDefaultState(true);
+          break;
+        }
         this._api.addComment(updatedFilm, update.newComment)
           .then((comments) => {
             this._commentsModel.updateComments(comments);
@@ -266,6 +273,11 @@ export default class FilmGrid {
           });
         break;
       case UserAction.REMOVE_COMMENT:
+        if (!isOnline()) {
+          toast('You can\'t remove comment offline');
+          update.filmDetailsModal.restoreDefaultState(true);
+          break;
+        }
         this._api.removeComment(update.delCommentId)
           .then(() => {
             this._commentsModel.removeComment(update.delCommentId);

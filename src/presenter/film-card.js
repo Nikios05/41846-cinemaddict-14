@@ -1,8 +1,10 @@
 import FilmCardView from '../view/film-card';
 import FilmDetails from '../view/film-details';
 import {render, remove, RenderPosition, replace} from '../utils/render';
-import {NavigationType, UpdateType, UserAction, END_POINT, AUTHORIZATION} from '../const';
-import Api from '../api';
+import {NavigationType, UpdateType, UserAction, END_POINT, AUTHORIZATION, STORE_NAME} from '../const';
+import Api from '../api/api';
+import Store from '../api/store';
+import Provider from '../api/provider';
 
 export default class FilmCard {
   constructor(changeData, newOpenCardModal, commentsModel, navigationModel, insertContainer) {
@@ -81,8 +83,10 @@ export default class FilmCard {
 
   _showDetailsFilm() {
     const api = new Api(END_POINT, AUTHORIZATION);
+    const store = new Store(STORE_NAME, window.localStorage);
+    const apiWithProvider = new Provider(api, store);
 
-    api.getFilmComments(this._filmData.id)
+    apiWithProvider.getFilmComments(this._filmData.id)
       .then((comments) => {
         this._commentsModel.setFilmComments(comments);
         this._commentsData = this._commentsModel.getFilmComments();
